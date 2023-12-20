@@ -16,7 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->float('price', 10, 2);
             $table->integer('quantity');
+            $table->unsignedBigInteger('category_id');
             $table->timestamps();
+
+            $table->foreign('category_id')->references('id')->on('categories');
         });
     }
 

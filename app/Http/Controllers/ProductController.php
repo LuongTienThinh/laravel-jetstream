@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\Product;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use App\Traits\ApiResponseTrait;
 
 class ProductController extends Controller
 {
+    use ApiResponseTrait;
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return $this->productPagination(Product::query()->with('category'));
     }
 
     /**
@@ -32,11 +36,13 @@ class ProductController extends Controller
         $name = $request->input("name");
         $price = floatval($request->input("price"));
         $quantity = intval($request->input("quantity"));
+        $category_id = $request->input("category");
 
         Product::create([
             'name' => $name,
             'price' => $price,
             'quantity' => $quantity,
+            'category_id' => $category_id,
         ]);
 
         return redirect()->back();
@@ -62,20 +68,31 @@ class ProductController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
-        $name = $request->input("name");
-        $price = floatval($request->input("price"));
-        $quantity = intval($request->input("quantity"));
+    {   
+        $this->validate($request, [
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric',
+            'quantity' => 'required|integer',
+            'category' => 'required',
+        ]);
+        $data = $request->all();
+        
+        // Tiếp tục xử lý cập nhật vào cơ sở dữ liệu
+        
+        $name = $request->input('name');
+        $price = floatval($request->input('price'));
+        $quantity = intval($request->input('quantity'));
+        $category = intval($request->input('category'));
 
-        $product = Product::find($id);
-
+        $product = Product::findOrFail($id);
         $product->name = $name;
         $product->price = $price;
         $product->quantity = $quantity;
+        $product->category_id = $category;
 
         $product->save();
 
-        return redirect()->back();
+        return response()->json(['message' => 'Product updated successfully']);
     }
 
     /**
@@ -94,8 +111,44 @@ class ProductController extends Controller
         return redirect()->back();
     }
 
-    public function productPagination(Request $request) {
-        $products = Product::paginate(5);
-        return view('product')->with(['products' => $products]);
+    public function productPagination(Builder $listProduct, $perPage = 5)
+    {
+        $listCategories = Category::all();
+        $products = $listProduct->simplePaginate($perPage);
+
+        $data = [
+            'products' => $products,
+            'categories' => $listCategories,
+        ];
+
+        try {
+            $listProducts = collect($data['products']->items())->map(function($item) {
+                $item->category_name = $item->category->name;
+                unset($item->category);
+                return $item;
+            });
+
+            $newData = [
+                'products'=> $listProducts,
+                'categories' => $data['categories'],
+            ];
+
+            $message = 'Get all products successfully';
+
+            return $this->successResponse($newData, 200, $message);
+        } catch (\Exception $e) {
+            return $this->errorResponse(500, $e->getMessage());
+        }
+    }
+
+    public function filterProduct(Request $request)
+    {
+        $search = $request->input('search');
+        
+        if (isset($search) ) {
+            $products = Product::where('name', 'like', '%' . $search . '%')->with('category');
+            return $this->productPagination($products);
+        }
+        return $this->index();
     }
 }
