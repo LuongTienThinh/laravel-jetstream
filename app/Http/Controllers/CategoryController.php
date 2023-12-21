@@ -2,16 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Traits\ApiResponseTrait;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    use ApiResponseTrait;
+
     /**
      * Display a listing of the resource.
+     * 
+     * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        try {
+            $message = 'Get all categories successfully';
+            $categories = Category::all();
+            return $this->successResponse($categories, 200, $message);
+        } catch (\Exception $e) {
+            return $this->errorResponse(500, $e->getMessage());
+        }
     }
 
     /**
@@ -27,7 +40,13 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $name = $request->input("name");
+
+        Category::create([
+            'name' => $name,
+        ]);
+
+        return redirect()->back();
     }
 
     /**
@@ -51,7 +70,15 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $name = $request->input("name");
+
+        $category = Category::find($id);
+
+        $category->name = $name;
+
+        $category->save();
+
+        return redirect()->back();
     }
 
     /**
@@ -59,6 +86,14 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $category = Category::find($id);
+
+        if (!$category) {
+            return response()->json(['message' => 'Category not found.'], 404);
+        }
+
+        $category->delete();
+
+        return redirect()->back();
     }
 }

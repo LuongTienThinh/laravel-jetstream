@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CategoryController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -27,5 +28,12 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
-    Route::get('/product', [ProductController::class, 'productPagination'])->name('product');
+    
+    Route::get('/product', function () {
+        return view('product');
+    })->name('product_web');
+
+    Route::get('/category', function () {
+        return view('category');
+    })->name('category_web');
 });
