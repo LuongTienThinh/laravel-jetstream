@@ -3,16 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Traits\ApiResponseTrait;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    use ApiResponseTrait;
+
     /**
      * Display a listing of the resource.
+     * 
+     * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        try {
+            $message = 'Get all categories successfully';
+            $categories = Category::all();
+            return $this->successResponse($categories, 200, $message);
+        } catch (\Exception $e) {
+            return $this->errorResponse(500, $e->getMessage());
+        }
     }
 
     /**
@@ -83,11 +95,5 @@ class CategoryController extends Controller
         $category->delete();
 
         return redirect()->back();
-    }
-
-    public function categoryPagination(Request $request) {
-        $categories = Category::paginate(5);
-        
-        return view('category')->with(['categories' => $categories]);
     }
 }

@@ -2,9 +2,19 @@
 
 namespace App\Traits;
 
+use Illuminate\Http\JsonResponse;
+
 trait ApiResponseTrait 
 {
-    public function successResponse($data, $statusCode, $message)
+    /**
+     * Generate a success response
+     * 
+     * @param  mixed  $data
+     * @param  int    $statusCode
+     * @param  string $message
+     * @return JsonResponse
+     */
+    public function successResponse($data, $statusCode, $message): JsonResponse
     {
         return response()->json([
             'status' => $statusCode,
@@ -12,8 +22,15 @@ trait ApiResponseTrait
             'data'=> $data,
         ], $statusCode);
     }
-
-    public function errorResponse($statusCode, $message)
+    
+    /**
+     * Generate a error response
+     * 
+     * @param  int    $statusCode
+     * @param  string $message
+     * @return JsonResponse
+     */
+    public function errorResponse($statusCode, $message): JsonResponse
     {
         return response()->json([
             'status' => $statusCode,

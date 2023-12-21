@@ -10,7 +10,7 @@ use Laravel\Jetstream\Features;
 use Hash;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<User>
  */
 class UserFactory extends Factory
 {

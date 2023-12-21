@@ -33,5 +33,7 @@ Route::middleware([
         return view('product');
     })->name('product_web');
 
-    Route::get('/category', [CategoryController::class, 'categoryPagination'])->name('category');
+    Route::get('/category', function () {
+        return view('category');
+    })->name('category_web');
 });
