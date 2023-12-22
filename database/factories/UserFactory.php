@@ -7,9 +7,10 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use Laravel\Jetstream\Features;
+use Hash;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<User>
  */
 class UserFactory extends Factory
 {
@@ -20,11 +21,19 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $name = $this->faker->unique()->firstName;
+        while (strlen($name) < 5) {
+            $name = $this->faker->unique()->firstName;
+        }
+
+        $email = Str::lower($name) . '@gmail.com';
+        $password = Hash::make(Str::lower($name) . '123');
+        
         return [
-            'name' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'name' => $name,
+            'email' => $email,
             'email_verified_at' => now(),
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+            'password' => $password,
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'remember_token' => Str::random(10),
