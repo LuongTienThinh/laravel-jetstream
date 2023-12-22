@@ -18,7 +18,7 @@ class ProductController extends Controller
      * Display a listing of the resource.
      * 
      * @param Request $request
-     * @param JsonResponse
+     * @return JsonResponse
      */
     public function index(Request $request): JsonResponse
     {
@@ -88,6 +88,7 @@ class ProductController extends Controller
      * Update the specified resource in storage.
      * 
      * @param  Request $request
+     * @param  string  $id
      * @return JsonResponse
      */
     public function update(Request $request, string $id): JsonResponse
@@ -153,7 +154,7 @@ class ProductController extends Controller
      * @param int     $perPage
      * @return JsonResponse
      */
-    public function productPagination(Builder $listProduct, $page = null, $perPage = null): JsonResponse
+    public function productPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse
     {
         $page = $page ?? 1;
         $perPage = $perPage ?? 5;

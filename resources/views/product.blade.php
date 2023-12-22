@@ -3,7 +3,7 @@ $page = 1;
 if (isset($_GET['page'])) {
     $page = $_GET['page'];
 }
-$url = $_SERVER['PHP_SELF'];
+$url = request()->path();
 
 ?>
 <x-app-layout>
@@ -13,7 +13,7 @@ $url = $_SERVER['PHP_SELF'];
         </h2>
     </x-slot>
 
-    <div class="py-12" id="product-area">
+    <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="product-wrap p-4">
@@ -315,7 +315,6 @@ $url = $_SERVER['PHP_SELF'];
         const url = 'http://127.0.0.1:8000/api/product';
         try {
             const categories = await getAllCategories();
-            console.log(categories);
             const response = await $.ajax({
                 url: url,
                 method: 'GET',
@@ -325,8 +324,8 @@ $url = $_SERVER['PHP_SELF'];
                 dataType: 'json'
             });
 
-            renderAddProduct(categories);
-            renderProducts(response.data.products, categories);
+            renderAddProduct(categories.data);
+            renderProducts(response.data.products, categories.data);
             paginationProduct(response.data);
             
         } catch (error) {
@@ -342,11 +341,15 @@ $url = $_SERVER['PHP_SELF'];
     }
 
     const search = async () => {
+        const categories = await getAllCategories();
+
         const searchContent = $('#search').val();
 
         try {
             const result = await getProductsFiltered(searchContent);
-            renderProducts(result.data.products, result.data.categories);
+
+            renderProducts(result.data.products, categories.data);
+
             $('#search').val('');
         } catch (error) {
             console.error('Error:', error);

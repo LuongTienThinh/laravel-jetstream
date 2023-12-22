@@ -14,7 +14,7 @@ trait ApiResponseTrait
      * @param  string $message
      * @return JsonResponse
      */
-    public function successResponse($data, $statusCode, $message): JsonResponse
+    public function successResponse(mixed $data, int $statusCode, string $message): JsonResponse
     {
         return response()->json([
             'status' => $statusCode,
@@ -30,7 +30,7 @@ trait ApiResponseTrait
      * @param  string $message
      * @return JsonResponse
      */
-    public function errorResponse($statusCode, $message): JsonResponse
+    public function errorResponse(int $statusCode, string $message): JsonResponse
     {
         return response()->json([
             'status' => $statusCode,

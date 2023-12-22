@@ -37,8 +37,10 @@ class CategoryController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * @param  Request $request
+     * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $name = $request->input("name");
 
@@ -46,7 +48,7 @@ class CategoryController extends Controller
             'name' => $name,
         ]);
 
-        return redirect()->back();
+        return response()->json(['message' => 'Success.']);
     }
 
     /**
@@ -67,8 +69,11 @@ class CategoryController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * @param  Request $request
+     * @param  string  $id
+     * @return JsonResponse
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id): JsonResponse
     {
         $name = $request->input("name");
 
@@ -78,13 +83,15 @@ class CategoryController extends Controller
 
         $category->save();
 
-        return redirect()->back();
+        return response()->json(['message' => 'Success.']);
     }
 
     /**
      * Remove the specified resource from storage.
+     * @param  string $id
+     * @return JsonResponse
      */
-    public function destroy(string $id)
+    public function destroy(string $id): JsonResponse
     {
         $category = Category::find($id);
 
@@ -94,6 +101,6 @@ class CategoryController extends Controller
 
         $category->delete();
 
-        return redirect()->back();
+        return response()->json(['message' => 'Success.']);
     }
 }
