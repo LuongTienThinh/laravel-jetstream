@@ -37,17 +37,23 @@
 </x-app-layout>
 
 <script>
-    const showModal = (btn, modal, close) => {
-        btn.addEventListener('click', () => {
-            modal.classList.remove('hidden');
+    const showModal = (btn, modal, close, submit) => {
+        $(btn).on('click', () => {
+            $(modal).removeClass('hidden');
+            $(modal).keyup(function(event) {
+                if (event.which === 13) {
+                    event.preventDefault();
+                    submit.click();
+                }
+            });
         });
-        close.addEventListener('click', () => {
-            modal.classList.add('hidden');
+
+        $(close).on('click', () => {
+            $(modal).addClass('hidden');
         });
-    }
+    };
 
     const renderModalAdd = () => {
-        showModal($('.btn-add-modal'), $('.add-category'), $('.close-add-category'));
         const btnAdd = $('#btn-add-category');
         btnAdd.on('click', () => {
             const name = $(`#create-name`).val();
@@ -62,7 +68,7 @@
                     name,
                 }),
                 success: function(response) {
-                    window.location.href = '{{ route('product_web') }}';
+                    window.location.href = '{{ route('category_web') }}';
                     console.log('Thêm thành công', response);
                 },
                 error: function(error) {
@@ -70,6 +76,8 @@
                 }
             });
         });
+
+        showModal($('.btn-add-modal'), $('.add-category'), $('.close-add-category'), btnAdd);
     }
 
     const renderModalEdit = () => {
@@ -77,9 +85,10 @@
         const modalEdits = $('.edit-category');
         const closeEdits = $('.close-edit-category');
         const submitEdits = $('.submit-edit-category');
+        console.log(btnEdits, modalEdits, closeEdits, submitEdits);
 
         btnEdits.each(function(index) {
-            showModal(this, modalEdits.eq(index), closeEdits.eq(index));
+            showModal(this, modalEdits.eq(index), closeEdits.eq(index), submitEdits.eq(index));
         });
 
         submitEdits.each(function() {
@@ -109,8 +118,30 @@
         });
     }
 
+    const handleDelete = () => {
+        const btnDeletes = $('.btn-delete-category');
+        btnDeletes.each(function() {
+            $(this).on('click', () => {
+                const id = this.id.split('-')[1];
+
+                const url = `http://127.0.0.1:8000/api/category/delete/${id}`;
+                $.ajax({
+                    url: url,
+                    type: 'DELETE',
+                    success: function(response) {
+                        window.location.href = '{{ route('category_web') }}';
+                        console.log('Xóa thành công', response);
+                    },
+                    error: function(error) {
+                        console.error('Lỗi khi xóa', error);
+                    }
+                });
+            });
+        });
+    }
+
     const renderAddCategories = () => {
-        const htmlContent = 
+        const htmlContent =
             `<div class="hidden add-category w-screen h-screen fixed inset-0 z-50 bg-slate-500/25">
                 <div class="absolute inset-1/2 translate-x-[-50%] translate-y-[-50%] w-full h-fit">
                     <div class="container relative mx-auto bg-white p-6 sm:rounded-lg max-w-[80%]">
@@ -136,7 +167,11 @@
 
     const renderCategories = (categories) => {
         if (categories) {
-            $('#category-list').html("");
+            $('#category-list').html(`<li class="p-2 flex flex-nowrap items-center justify-between font-black">
+                                        <span class="w-[10%]">No</span>
+                                        <span class="w-[30%] text-center">Category Name</span>
+                                        <span class="action w-[30%] text-center">Action</span>
+                                    </li>`);
         }
 
         categories.forEach((item, i) => {
@@ -161,15 +196,18 @@
                                     required value="${item.name}">
                                 </div>
                                 <div class="text-center mt-6">
-                                    <button type="submit" id="edit-${id}" class="px-6 py-2 rounded bg-blue-400 text-white">{{ __('Update') }}</button>
+                                    <button type="submit" id="edit-${item.id}" class="submit-edit-category px-6 py-2 rounded bg-blue-400 text-white">{{ __('Update') }}</button>
                                 </div>
                             </div>
                             <button class="close-edit-category absolute top-2 right-2 px-2">x</button>
                         </div>
                     </div>
                 </div>`;
-            $('#category-list').html($('#category-list').html + htmlContent);
+            $('#category-list').html($('#category-list').html() + htmlContent);
         });
+
+        renderModalEdit();
+        handleDelete();
     }
 
     const getAllCategories = async () => {
