@@ -1,8 +1,15 @@
 <?php
 $page = 1;
+$search = '';
+
 if (isset($_GET['page'])) {
     $page = $_GET['page'];
 }
+
+if (isset($_GET['search'])) {
+    $search = $_GET['search'];
+}
+
 $url = request()->path();
 
 ?>
@@ -57,9 +64,15 @@ $url = request()->path();
 </x-app-layout>
 
 <script>
-    const showModal = (btn, modal, close) => {
+    const showModal = (btn, modal, close, submit) => {
         $(btn).on('click', () => {
             $(modal).removeClass('hidden');
+            $(modal).keyup(function(event) {
+                if (event.which === 13) {
+                    event.preventDefault();
+                    submit.click();
+                }
+            });
         });
 
         $(close).on('click', () => {
@@ -68,7 +81,6 @@ $url = request()->path();
     };
 
     const renderModalAdd = () => {
-        showModal($('.btn-add-modal'), $('.add-product'), $('.close-add-product'));
         const btnAdd = $('#btn-add-product');
         btnAdd.on('click', () => {
             const [name, price, quantity, category] = [
@@ -88,7 +100,7 @@ $url = request()->path();
                     name,
                     price: parseFloat(price),
                     quantity: parseInt(quantity),
-                    category: parseInt(category)
+                    category_id: parseInt(category)
                 }),
                 success: function(response) {
                     window.location.href = '{{ route('product_web') }}';
@@ -99,6 +111,8 @@ $url = request()->path();
                 }
             });
         });
+
+        showModal($('.btn-add-modal'), $('.add-product'), $('.close-add-product'), btnAdd);
     }
 
     const renderModalEdit = () => {
@@ -107,42 +121,46 @@ $url = request()->path();
         const closeEdits = $('.close-edit-product');
         const submitEdits = $('.submit-edit-product');
 
-        btnEdits.each(function(index) {
-            showModal(this, modalEdits.eq(index), closeEdits.eq(index));
-        });
+        const handleSubmit = (item) => {
+            const id = item.id.split('-')[1];
+
+            const [name, price, quantity, category] = [
+                $(`#edit-name-${id}`).val(),
+                $(`#edit-price-${id}`).val(),
+                $(`#edit-quantity-${id}`).val(),
+                $(`#edit-category-${id}`).val()
+            ];
+
+            const url = `http://127.0.0.1:8000/api/product/edit/${id}`;
+
+            $.ajax({
+                url: url,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    name,
+                    price: parseFloat(price),
+                    quantity: parseInt(quantity),
+                    category_id: parseInt(category)
+                }),
+                success: function(response) {
+                    window.location.href = '{{ route('product_web') }}';
+                    console.log('Cập nhật thành công', response);
+                },
+                error: function(error) {
+                    console.error('Lỗi khi cập nhật', error);
+                }
+            });
+        }
 
         submitEdits.each(function() {
             $(this).on('click', () => {
-                const id = this.id.split('-')[1];
-
-                const [name, price, quantity, category] = [
-                    $(`#edit-name-${id}`).val(),
-                    $(`#edit-price-${id}`).val(),
-                    $(`#edit-quantity-${id}`).val(),
-                    $(`#edit-category-${id}`).val()
-                ];
-
-                const url = `http://127.0.0.1:8000/api/product/edit/${id}`;
-
-                $.ajax({
-                    url: url,
-                    type: 'PUT',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        name,
-                        price: parseFloat(price),
-                        quantity: parseInt(quantity),
-                        category: parseInt(category)
-                    }),
-                    success: function(response) {
-                        window.location.href = '{{ route('product_web') }}';
-                        console.log('Cập nhật thành công', response);
-                    },
-                    error: function(error) {
-                        console.error('Lỗi khi cập nhật', error);
-                    }
-                });
+                handleSubmit(this);
             });
+        });
+
+        btnEdits.each(function(index) {
+            showModal(this, modalEdits.eq(index), closeEdits.eq(index), submitEdits.eq(index));
         });
     }
 
@@ -198,8 +216,8 @@ $url = request()->path();
                                     placeholder="Product quantity" required>
                             </div>
                             <div class="flex items-center justify-around py-2">
-                                <label class="w-20" for="category">{{ __('Category') }}:</label>
-                                <select class="w-[70%]" name="category" id="create-category">
+                                <label class="w-20" for="category_id">{{ __('Category') }}:</label>
+                                <select class="w-[70%]" name="category_id" id="create-category">
                                     ${renderSelectCategories(null, categories)}
                                 </select>
                             </div>
@@ -216,13 +234,13 @@ $url = request()->path();
         renderModalAdd();
     }
 
-    const paginationProduct = (paginate) => {
+    const paginationProduct = (paginate, searchContent) => {
         const htmlPrev = paginate.prev ?
-            `<a href="<?php echo $url; ?>?page=<?php echo $page - 1; ?>" rel="prev" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">« Previous</a>` :
+            `<a href="<?php echo $url; ?>?page=<?php echo $page - 1; ?>${searchContent ? `&search=${searchContent}` : ''}" rel="prev" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">« Previous</a>` :
             `<span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md">« Previous</span>`;
 
         const htmlNext = paginate.next ?
-            `<a href="<?php echo $url; ?>?page=<?php echo $page + 1; ?>" rel="next" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">Next »</a>` :
+            `<a href="<?php echo $url; ?>?page=<?php echo $page + 1; ?>${searchContent ? `&search=${searchContent}` : ''}" rel="next" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">Next »</a>` :
             `<span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md">Next »</span>`;
 
         const htmlPaginate =
@@ -236,7 +254,14 @@ $url = request()->path();
 
     const renderProducts = (products, categories) => {
         if (products) {
-            $("#product-list").html("");
+            $("#product-list").html(`<li class="p-2 flex flex-nowrap items-center w-[130%] font-black">
+                                <span class="w-[10%]">No</span>
+                                <span class="w-[30%] text-center">Product Name</span>
+                                <span class="w-[20%] text-center">Price</span>
+                                <span class="w-[20%] text-center">Quantity</span>
+                                <span class="w-[20%] text-center">Category</span>
+                                <span class="action w-[30%] text-center">Action</span>
+                            </li>`);
         }
 
         products.forEach((item) => {
@@ -273,8 +298,8 @@ $url = request()->path();
                                         value="${item.quantity}">
                                 </div>
                                 <div class="flex items-center justify-around py-2">
-                                    <label class="w-20" for="category">{{ __('Category') }}:</label>
-                                    <select class="w-[70%]" name="category" id="edit-category-${item.id}">
+                                    <label class="w-20" for="category_id">{{ __('Category') }}:</label>
+                                    <select class="w-[70%]" name="category_id" id="edit-category-${item.id}">
                                         ${renderSelectCategories(item, categories)}
                                     </select>
                                 </div>
@@ -312,6 +337,7 @@ $url = request()->path();
     }
 
     const getAllProducts = async () => {
+        console.log('<?php echo $page; ?>');
         const url = 'http://127.0.0.1:8000/api/product';
         try {
             const categories = await getAllCategories();
@@ -319,10 +345,15 @@ $url = request()->path();
                 url: url,
                 method: 'GET',
                 data: {
-                    page: parseInt('<?php echo $page; ?>') 
+                    page: parseInt('<?php echo $page; ?>'),
+                    search: '<?php echo $search; ?>'
                 },
                 dataType: 'json'
             });
+
+            @php @endphp
+
+            $('#pagination').html("");
 
             renderAddProduct(categories.data);
             renderProducts(response.data.products, categories.data);
@@ -335,8 +366,9 @@ $url = request()->path();
     getAllProducts();
 
     const getProductsFiltered = async (searchContent) => {
-        const response = await fetch(`http://127.0.0.1:8000/api/product/search?search=${searchContent}`)
+        const response = await fetch(`http://127.0.0.1:8000/api/product?search=${searchContent}&page=1`);
         const result = await response.json();
+        <?php $page = 1; ?>
         return result;
     }
 
@@ -348,7 +380,10 @@ $url = request()->path();
         try {
             const result = await getProductsFiltered(searchContent);
 
+            $('#pagination').html("");
+            
             renderProducts(result.data.products, categories.data);
+            paginationProduct(result.data, searchContent);
 
             $('#search').val('');
         } catch (error) {

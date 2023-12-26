@@ -6,23 +6,43 @@ use App\Models\Category;
 use App\Models\Product;
 
 use Illuminate\Database\Eloquent\Builder;
-use App\Http\Resources\ProductResource;
+use OpenApi\Annotations as OA;
 use \Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\UpdateProductRequest;
 use App\Traits\ApiResponseTrait;
 
 class ProductController extends Controller
 {
     use ApiResponseTrait;
+
     /**
      * Display a listing of the resource.
      * 
      * @param Request $request
      * @return JsonResponse
      */
+
+    #[OA\Get(
+        path: '/api/users',
+        responses: [
+            new OA\Response(response: 200, description: 'AOK'),
+            new OA\Response(response: 401, description: 'Not allowed'),
+        ]
+    )]
     public function index(Request $request): JsonResponse
     {
-        return $this->productPagination(Product::with('category'), $request->page);
+        $search = $request->search;
+        $page = $request->page;
+
+        // dd($page, $search);
+
+        if (isset($search)) {
+            $products = $this->filterProduct($search);
+            return $this->productPagination($products, $page);
+        }
+
+        return $this->productPagination(Product::with('category'), $page);
     }
 
     /**
@@ -39,26 +59,11 @@ class ProductController extends Controller
      * @param  Request $request
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(UpdateProductRequest $request): JsonResponse
     {
-        $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'quantity' => 'required|integer',
-            'category' => 'required',
-        ]);
+
         try {
-            $name = $request->input('name');
-            $price = floatval($request->input('price'));
-            $quantity = intval($request->input('quantity'));
-            $category = intval($request->input('category'));
-    
-            Product::create([
-                'name' => $name,
-                'price' => $price,
-                'quantity' => $quantity,
-                'category_id' => $category,
-            ]);
+            Product::create($request->validated());
 
             $message = 'Product created successfully';
 
@@ -93,13 +98,6 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id): JsonResponse
     {   
-        $this->validate($request, [
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
-            'quantity' => 'required|integer',
-            'category' => 'required',
-        ]);
-
         try {
             $name = $request->input('name');
             $price = floatval($request->input('price'));
@@ -191,16 +189,10 @@ class ProductController extends Controller
      * Filter list of products with condition
      * 
      * @param  Request $request
-     * @return JsonResponse
+     * @return Builder
      */
-    public function filterProduct(Request $request): JsonResponse
+    public function filterProduct(string $search): Builder
     {
-        $search = $request->input('search');
-        
-        if (isset($search)) {
-            $products = Product::where('name', 'like', '%' . $search . '%')->with('category');
-            return $this->productPagination($products);
-        }
-        return $this->index($request);
+        return Product::where('name', 'like', '%' . $search . '%')->with('category');
     }
 }
