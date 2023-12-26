@@ -27,6 +27,7 @@ $url = request()->path();
                     <div class="flex justify-between items-center mb-6">
                         <span>{{ __('List Products') }}</span>
                         <div class="relative w-[50%]">
+                            <label for="search"></label>
                             <input class="border-gray-400 focus:outline-0 focus:ring-0 rounded-lg w-full" type="text"
                                 name="search" id="search" placeholder="Search here...">
                             <button id="search-product"
@@ -187,8 +188,8 @@ $url = request()->path();
     }
 
     const renderSelectCategories = (currentItem, categories) => {
-        return selectCategories = categories.reduce((acc, curr) => {
-            if (currentItem && curr.id == currentItem.category_id) {
+        return categories.reduce((acc, curr) => {
+            if (currentItem && curr.id === currentItem.category_id) {
                 return acc + `\n<option value="${curr.id}" selected>${curr.name}</option>`;
             }
             return acc + `\n<option value="${curr.id}">${curr.name}</option>`;
@@ -196,6 +197,8 @@ $url = request()->path();
     }
 
     const renderAddProduct = (categories) => {
+        const productArea = $("#product-area");
+
         const htmlContent =
             `<div class="hidden add-product w-screen h-screen fixed inset-0 z-50 bg-slate-500/25">
                 <div class="absolute inset-1/2 translate-x-[-50%] translate-y-[-50%] w-full h-fit">
@@ -230,11 +233,13 @@ $url = request()->path();
                     </div>
                 </div>
             </div>`;
-        $("#product-area").html($("#product-area").html() + htmlContent);
+        productArea.html(productArea.html() + htmlContent);
         renderModalAdd();
     }
 
     const paginationProduct = (paginate, searchContent) => {
+        const paginationHtml = $('#pagination');
+
         const htmlPrev = paginate.prev ?
             `<a href="<?php echo $url; ?>?page=<?php echo $page - 1; ?>${searchContent ? `&search=${searchContent}` : ''}" rel="prev" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">« Previous</a>` :
             `<span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md">« Previous</span>`;
@@ -249,12 +254,14 @@ $url = request()->path();
                 ${htmlNext}
             </nav>`;
 
-        $('#pagination').html($('#pagination').html() + htmlPaginate);
+        paginationHtml.html(paginationHtml.html() + htmlPaginate);
     }
 
     const renderProducts = (products, categories) => {
+        const productList = $("#product-list");
+
         if (products) {
-            $("#product-list").html(`<li class="p-2 flex flex-nowrap items-center w-[130%] font-black">
+            productList.html(`<li class="p-2 flex flex-nowrap items-center w-[130%] font-black">
                                 <span class="w-[10%]">No</span>
                                 <span class="w-[30%] text-center">Product Name</span>
                                 <span class="w-[20%] text-center">Price</span>
@@ -311,7 +318,7 @@ $url = request()->path();
                         </div>
                     </div>
                 </div>`;
-            $("#product-list").html($("#product-list").html() + htmlContent);
+            productList.html(productList.html() + htmlContent);
         });
         renderModalEdit();
         handleDelete();
@@ -321,13 +328,10 @@ $url = request()->path();
         const url = 'http://127.0.0.1:8000/api/category';
         let result = null;
         try {
-            const response = await $.ajax({
+            result = await $.ajax({
                 url: url,
                 method: 'GET',
-                dataType: 'json'
             });
-
-            result = response;
 
         } catch (error) {
             console.error('Error', error)
@@ -337,28 +341,26 @@ $url = request()->path();
     }
 
     const getAllProducts = async () => {
-        console.log('<?php echo $page; ?>');
-        const url = 'http://127.0.0.1:8000/api/product';
+        const data = {
+            page: parseInt('<?php echo $page; ?>'),
+            search: '<?php echo $search; ?>'
+        };
+
+        const queryString = new URLSearchParams(data).toString();
+        const url = `http://127.0.0.1:8000/api/product/get-list/${data.search}-${data.page}`;
         try {
             const categories = await getAllCategories();
             const response = await $.ajax({
                 url: url,
                 method: 'GET',
-                data: {
-                    page: parseInt('<?php echo $page; ?>'),
-                    search: '<?php echo $search; ?>'
-                },
-                dataType: 'json'
             });
-
-            @php @endphp
 
             $('#pagination').html("");
 
             renderAddProduct(categories.data);
             renderProducts(response.data.products, categories.data);
             paginationProduct(response.data);
-            
+
         } catch (error) {
             console.error('Error:', error);
         }
@@ -367,25 +369,23 @@ $url = request()->path();
 
     const getProductsFiltered = async (searchContent) => {
         const response = await fetch(`http://127.0.0.1:8000/api/product?search=${searchContent}&page=1`);
-        const result = await response.json();
-        <?php $page = 1; ?>
-        return result;
+        return await response.json();
     }
 
     const search = async () => {
         const categories = await getAllCategories();
 
-        const searchContent = $('#search').val();
+        const searchContent = $('#search');
 
         try {
-            const result = await getProductsFiltered(searchContent);
+            const result = await getProductsFiltered(searchContent.val());
 
             $('#pagination').html("");
-            
-            renderProducts(result.data.products, categories.data);
-            paginationProduct(result.data, searchContent);
 
-            $('#search').val('');
+            renderProducts(result.data.products, categories.data);
+            paginationProduct(result.data, searchContent.val());
+
+            searchContent.val('');
         } catch (error) {
             console.error('Error:', error);
         }

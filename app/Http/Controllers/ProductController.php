@@ -2,15 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\Product;
 
-use Illuminate\Database\Eloquent\Builder;
-use OpenApi\Annotations as OA;
-use \Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use App\Models\Product;
 use App\Http\Requests\UpdateProductRequest;
 use App\Traits\ApiResponseTrait;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use OpenApi\Attributes\Delete;
+use OpenApi\Attributes\Get;
+use OpenApi\Attributes\Parameter;
+use OpenApi\Attributes\Post;
+use OpenApi\Attributes\Put;
+use OpenApi\Attributes\RequestBody;
+use OpenApi\Attributes\JsonContent;
+use OpenApi\Attributes\Property;
+use OpenApi\Attributes\Response;
+use Exception;
+use OpenApi\Attributes\Schema;
+
+/**
+ * @OA\Info(title="My First API", version="0.1")
+ */
 
 class ProductController extends Controller
 {
@@ -18,24 +31,62 @@ class ProductController extends Controller
 
     /**
      * Display a listing of the resource.
-     * 
-     * @param Request $request
+     *
+     * @param  Request $request
      * @return JsonResponse
      */
-
-    #[OA\Get(
-        path: '/api/users',
+    #[Get(
+        path: '/api/product/get-list',
+        operationId: "getListProducts",
+        description: "Get list products by search (default: empty) for each page (default: 1).",
+        summary: "Get list products",
+        parameters: [
+            new Parameter(
+                name: "search",
+                in: "query",
+                required: false,
+                schema: new Schema(
+                    type: "string",
+                )
+            ),
+            new Parameter(
+                name: "page",
+                in: "query",
+                required: false,
+                schema: new Schema(
+                    type: "int",
+                )
+            )
+        ],
         responses: [
-            new OA\Response(response: 200, description: 'AOK'),
-            new OA\Response(response: 401, description: 'Not allowed'),
+            new Response(
+                response: 200,
+                description: 'Success',
+                content: new JsonContent(
+                    properties: [
+                        new Property(property: "status", type: "int", example: 200),
+                        new Property(property: "message", type: "string", example: "Get list products successfully.")
+                    ]
+                )
+            ),
+            new Response(
+                response: 500,
+                description: 'Error',
+                content: new JsonContent(
+                    properties: [
+                        new Property(property: "status", type: "int", example: 500),
+                        new Property(property: "message", type: "string", example: "Internal server error.")
+                    ]
+                )
+            ),
         ]
     )]
     public function index(Request $request): JsonResponse
     {
-        $search = $request->search;
-        $page = $request->page;
+        $search = $request->get('search');
+        $page = $request->get('page');
 
-        // dd($page, $search);
+//        dd($page, $search);
 
         if (isset($search)) {
             $products = $this->filterProduct($search);
@@ -55,10 +106,47 @@ class ProductController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     * 
-     * @param  Request $request
+     *
+     * @param  UpdateProductRequest $request
      * @return JsonResponse
      */
+    #[Post(
+        path: '/api/product/create',
+        operationId: "createProduct",
+        description: "Create a product and add it into products table.",
+        summary: "Create a product",
+        requestBody: new RequestBody(
+            required: true,
+            content: new JsonContent(
+                properties: [
+                    new Property(property: "name", type: "string", example: "Redmi note 9"),
+                    new Property(property: "price", type: "float", example: "48.500"),
+                    new Property(property: "quantity", type: "int", example: "20"),
+                    new Property(property: "category_id", type: "int", example: "1"),
+                ]
+            )
+        ),
+        responses: [
+            new Response(
+                response: 200,
+                description: 'Success',
+                content: new JsonContent(
+                    properties: [
+                        new Property(property: "message", type: "string", example: "Create a product successfully.")
+                    ]
+                )
+            ),
+            new Response(
+                response: 500,
+                description: 'Error',
+                content: new JsonContent(
+                    properties: [
+                        new Property(property: "message", type: "string", example: "Internal server error.")
+                    ]
+                )
+            ),
+        ]
+    )]
     public function store(UpdateProductRequest $request): JsonResponse
     {
 
@@ -68,7 +156,7 @@ class ProductController extends Controller
             $message = 'Product created successfully';
 
             return $this->successResponse(null, 200, $message);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
     }
@@ -91,19 +179,66 @@ class ProductController extends Controller
 
     /**
      * Update the specified resource in storage.
-     * 
+     *
      * @param  Request $request
      * @param  string  $id
      * @return JsonResponse
      */
+    #[Put(
+        path: '/api/product/edit/{id}',
+        operationId: "updateProduct",
+        description: "Update a product's information in products table",
+        summary: "Update a product",
+        requestBody: new RequestBody(
+            required: true,
+            content: new JsonContent(
+                properties: [
+                    new Property(property: "name", type: "string", example: "Redmi note 9"),
+                    new Property(property: "price", type: "number", format: "float", example: 48500),
+                    new Property(property: "quantity", type: "int", example: 20),
+                    new Property(property: "category", type: "int", example: 1),
+                ]
+            )
+        ),
+        parameters: [
+            new Parameter(
+                name: "id",
+                in: "path",
+                required: true,
+                schema: new Schema(
+                    type: "string"
+                )
+            )
+        ],
+        responses: [
+            new Response(
+                response: 200,
+                description: 'Success',
+                content: new JsonContent(
+                    properties: [
+                        new Property(property: "message", type: "string", example: "Update a product successfully.")
+                    ]
+                )
+            ),
+            new Response(
+                response: 500,
+                description: 'Error',
+                content: new JsonContent(
+                    properties: [
+                        new Property(property: "message", type: "string", example: "Internal server error.")
+                    ]
+                )
+            ),
+        ]
+    )]
     public function update(Request $request, string $id): JsonResponse
-    {   
+    {
         try {
             $name = $request->input('name');
             $price = floatval($request->input('price'));
             $quantity = intval($request->input('quantity'));
             $category = intval($request->input('category'));
-    
+
             $product = Product::findOrFail($id);
             $product->name = $name;
             $product->price = $price;
@@ -115,17 +250,53 @@ class ProductController extends Controller
             $message = 'Product updated successfully';
 
             return $this->successResponse(null, 200, $message);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
     }
 
     /**
      * Remove the specified resource from storage.
-     * 
+     *
      * @param  string $id
      * @return JsonResponse
      */
+    #[Delete(
+        path: '/api/product/delete/{id}',
+        operationId: "deleteProduct",
+        description: "Delete a product's information in products table",
+        summary: "Delete a product",
+        parameters: [
+            new Parameter(
+                name: "id",
+                in: "path",
+                required: true,
+                schema: new Schema(
+                    type: "string"
+                )
+            )
+        ],
+        responses: [
+            new Response(
+                response: 200,
+                description: 'Success',
+                content: new JsonContent(
+                    properties: [
+                        new Property(property: "message", type: "string", example: "Delete a product successfully.")
+                    ]
+                )
+            ),
+            new Response(
+                response: 500,
+                description: 'Error',
+                content: new JsonContent(
+                    properties: [
+                        new Property(property: "message", type: "string", example: "Internal server error.")
+                    ]
+                )
+            ),
+        ]
+    )]
     public function destroy(string $id): JsonResponse
     {
         $product = Product::find($id);
@@ -139,17 +310,17 @@ class ProductController extends Controller
             $message = 'Product deleted successfully';
 
             return $this->successResponse(null, 200, $message);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
     }
 
     /**
      * Paginate for the list of products
-     * 
-     * @param Builder $listProduct
-     * @param int     $page
-     * @param int     $perPage
+     *
+     * @param  Builder  $listProduct
+     * @param  int|null $page
+     * @param  int|null $perPage
      * @return JsonResponse
      */
     public function productPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse
@@ -177,18 +348,18 @@ class ProductController extends Controller
                 'next' => $next
             ];
 
-            $message = 'Get all products successfully';
+            $message = 'Get list products successfully';
 
             return $this->successResponse($newData, 200, $message);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
     }
 
     /**
      * Filter list of products with condition
-     * 
-     * @param  Request $request
+     *
+     * @param  string $search
      * @return Builder
      */
     public function filterProduct(string $search): Builder
