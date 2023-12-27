@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Models\Product;
 use App\Http\Requests\UpdateProductRequest;
 use App\Traits\ApiResponseTrait;
@@ -18,13 +17,12 @@ use OpenApi\Attributes\RequestBody;
 use OpenApi\Attributes\JsonContent;
 use OpenApi\Attributes\Property;
 use OpenApi\Attributes\Response;
-use Exception;
 use OpenApi\Attributes\Schema;
+use Exception;
 
 /**
  * @OA\Info(title="My First API", version="0.1")
  */
-
 class ProductController extends Controller
 {
     use ApiResponseTrait;
@@ -231,13 +229,13 @@ class ProductController extends Controller
             ),
         ]
     )]
-    public function update(Request $request, string $id): JsonResponse
+    public function update(UpdateProductRequest $request, string $id): JsonResponse
     {
         try {
-            $name = $request->input('name');
-            $price = floatval($request->input('price'));
-            $quantity = intval($request->input('quantity'));
-            $category = intval($request->input('category'));
+            $name = $request->validated('name');
+            $price = $request->validated('price');
+            $quantity = $request->validated('quantity');
+            $category = $request->validated('category');
 
             $product = Product::findOrFail($id);
             $product->name = $name;
@@ -301,7 +299,7 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
-        if (!$product) {
+        if ($product instanceof Product) {
             return response()->json(['message' => 'Product not found.'], 404);
         }
 
