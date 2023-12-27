@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Exception;
 
 class CategoryController extends Controller
 {
@@ -13,7 +14,7 @@ class CategoryController extends Controller
 
     /**
      * Display a listing of the resource.
-     * 
+     *
      * @return JsonResponse
      */
     public function index(): JsonResponse
@@ -22,7 +23,7 @@ class CategoryController extends Controller
             $message = 'Get all categories successfully';
             $categories = Category::all();
             return $this->successResponse($categories, 200, $message);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
     }
