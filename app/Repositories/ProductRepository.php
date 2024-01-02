@@ -13,17 +13,62 @@ use Prettus\Repository\Contracts\RepositoryInterface;
  */
 interface ProductRepository extends RepositoryInterface
 {
-    public function create(array $attributes);
 
-    public function update(array $attributes, $id);
+    /**
+     * Create a product
+     *
+     * @param  array $attributes
+     * @return void
+     */
+    public function create(array $attributes): void;
 
-    public function delete($id);
+    /**
+     * Update a product
+     *
+     * @param  array $attributes
+     * @param  $id
+     * @return bool
+     */
+    public function update(array $attributes, $id): bool;
 
-    public function findById($id);
+    /**
+     * Delete a product
+     *
+     * @param  $id
+     * @return bool
+     */
+    public function delete($id): bool;
 
-    public function filterSearch(string $search);
+    /**
+     * Find a product by id
+     *
+     * @param  $id
+     * @return mixed
+     */
+    public function findById($id): mixed;
 
-    public function getProductWith();
+    /**
+     * Get list products by search content
+     *
+     * @param  string $search
+     * @return Builder
+     */
+    public function filterSearch(string $search): Builder;
 
-    public function productPagination(Builder $listProduct, int $page = null, int $perPage = null);
+    /**
+     * Insert category into products
+     *
+     * @return Builder
+     */
+    public function getProductWith(): Builder;
+
+    /**
+     * Paginate for the list of products
+     *
+     * @param  Builder  $listProduct
+     * @param  int|null $page
+     * @param  int|null $perPage
+     * @return JsonResponse
+     */
+    public function productPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse;
 }

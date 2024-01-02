@@ -38,24 +38,11 @@ class ProductRepositoryEloquent extends BaseRepository implements ProductReposit
         $this->pushCriteria(app(RequestCriteria::class));
     }
 
-    /**
-     * Create a product
-     *
-     * @param  array $attributes
-     * @return void
-     */
     public function create(array $attributes): void
     {
         $this->model->create($attributes);
     }
 
-    /**
-     * Update a product
-     *
-     * @param  array $attributes
-     * @param  $id
-     * @return bool
-     */
     public function update(array $attributes, $id): bool
     {
         $product = $this->findById($id);
@@ -66,12 +53,6 @@ class ProductRepositoryEloquent extends BaseRepository implements ProductReposit
         return false;
     }
 
-    /**
-     * Delete a product
-     *
-     * @param  $id
-     * @return bool
-     */
     public function delete($id): bool
     {
         $product = $this->findById($id);
@@ -82,48 +63,21 @@ class ProductRepositoryEloquent extends BaseRepository implements ProductReposit
         return false;
     }
 
-    /**
-     * Find a product by id
-     *
-     * @param  $id
-     * @return mixed
-     */
     public function findById($id): mixed
     {
         return $this->model->findOrFail($id);
     }
 
-    /**
-     * Get list products by search content
-     *
-     * @param  string $search
-     * @return Builder
-     */
     public function filterSearch(string $search): Builder
     {
         return $this->model->where('name', 'like', '%' . $search . '%')->with('category');
     }
 
-    /**
-     * Insert category into products
-     *
-     * @return Builder
-     */
     public function getProductWith(): Builder
     {
         return $this->model->with('category');
     }
 
-
-
-    /**
-     * Paginate for the list of products
-     *
-     * @param  Builder  $listProduct
-     * @param  int|null $page
-     * @param  int|null $perPage
-     * @return JsonResponse
-     */
     public function productPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse
     {
         $page = $page ?? 1;
