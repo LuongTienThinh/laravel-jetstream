@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Http\Requests\UpdateProductRequest;
+use App\Repositories\ProductRepository;
 use App\Traits\ApiResponseTrait;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes\Delete;
@@ -26,6 +25,13 @@ use Exception;
 class ProductController extends Controller
 {
     use ApiResponseTrait;
+
+    public ProductRepository $productRepository;
+
+    public function __construct(ProductRepository $productRepository)
+    {
+        $this->productRepository = $productRepository;
+    }
 
     /**
      * Display a listing of the resource.
@@ -84,14 +90,11 @@ class ProductController extends Controller
         $search = $request->get('search');
         $page = $request->get('page');
 
-//        dd($page, $search);
-
         if (isset($search)) {
-            $products = $this->filterProduct($search);
-            return $this->productPagination($products, $page);
+            $products = $this->productRepository->filterSearch($search);
+            return $this->productRepository->productPagination($products, $page);
         }
-
-        return $this->productPagination(Product::with('category'), $page);
+        return $this->productRepository->productPagination($this->productRepository->getProductWith(), $page);
     }
 
     /**
@@ -147,12 +150,10 @@ class ProductController extends Controller
     )]
     public function store(UpdateProductRequest $request): JsonResponse
     {
-
         try {
-            Product::create($request->validated());
+            $this->productRepository->create($request->validated());
 
             $message = 'Product created successfully';
-
             return $this->successResponse(null, 200, $message);
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
@@ -232,22 +233,13 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, string $id): JsonResponse
     {
         try {
-            $name = $request->validated('name');
-            $price = $request->validated('price');
-            $quantity = $request->validated('quantity');
-            $category = $request->validated('category');
-
-            $product = Product::findOrFail($id);
-            $product->name = $name;
-            $product->price = $price;
-            $product->quantity = $quantity;
-            $product->category_id = $category;
-
-            $product->save();
-
-            $message = 'Product updated successfully';
-
-            return $this->successResponse(null, 200, $message);
+            $result = $this->productRepository->update($request->validated(), $id);
+            if ($result) {
+                $message = 'Product updated successfully';
+                return $this->successResponse(null, 200, $message);
+            } else {
+                return response()->json(['message' => 'Product not found.'], 404);
+            }
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
@@ -297,71 +289,16 @@ class ProductController extends Controller
     )]
     public function destroy(string $id): JsonResponse
     {
-        $product = Product::find($id);
-
-        if ($product instanceof Product) {
-            return response()->json(['message' => 'Product not found.'], 404);
-        }
-
         try {
-            $product->delete();
-            $message = 'Product deleted successfully';
-
-            return $this->successResponse(null, 200, $message);
+            $result = $this->productRepository->delete($id);
+            if ($result) {
+                $message = 'Product deleted successfully';
+                return $this->successResponse(null, 200, $message);
+            } else {
+                return response()->json(['message' => 'Product not found.'], 404);
+            }
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
-    }
-
-    /**
-     * Paginate for the list of products
-     *
-     * @param  Builder  $listProduct
-     * @param  int|null $page
-     * @param  int|null $perPage
-     * @return JsonResponse
-     */
-    public function productPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse
-    {
-        $page = $page ?? 1;
-        $perPage = $perPage ?? 5;
-
-        $products = $listProduct->skip(($page - 1) * $perPage)->take($perPage)->get();
-        $nextProducts = $listProduct->skip($page * $perPage)->take($perPage)->get();
-
-        $prev = $page > 1 && $products->isNotEmpty();
-        $next = $nextProducts->isNotEmpty();
-
-        try {
-            $listProducts = $products->map(function($item, $index) use($page, $perPage) {
-                $item->category_name = $item->category->name;
-                $item->no = ($page - 1) * $perPage + 1 + $index;
-                unset($item->category);
-                return $item;
-            });
-
-            $newData = [
-                'products'=> $listProducts,
-                'prev' => $prev,
-                'next' => $next
-            ];
-
-            $message = 'Get list products successfully';
-
-            return $this->successResponse($newData, 200, $message);
-        } catch (Exception $e) {
-            return $this->errorResponse(500, $e->getMessage());
-        }
-    }
-
-    /**
-     * Filter list of products with condition
-     *
-     * @param  string $search
-     * @return Builder
-     */
-    public function filterProduct(string $search): Builder
-    {
-        return Product::where('name', 'like', '%' . $search . '%')->with('category');
     }
 }
