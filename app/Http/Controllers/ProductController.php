@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
 use App\Http\Requests\UpdateProductRequest;
 use App\Repositories\ProductRepository;
 use App\Traits\ApiResponseTrait;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use OpenApi\Attributes\Delete;
@@ -94,9 +92,9 @@ class ProductController extends Controller
 
         if (isset($search)) {
             $products = $this->productRepository->filterSearch($search);
-            return $this->productPagination($products, $page);
+            return $this->productRepository->productPagination($products, $page);
         }
-        return $this->productPagination($this->productRepository->getProductWith(), $page);
+        return $this->productRepository->productPagination($this->productRepository->getProductWith(), $page);
     }
 
     /**
@@ -299,47 +297,6 @@ class ProductController extends Controller
             } else {
                 return response()->json(['message' => 'Product not found.'], 404);
             }
-        } catch (Exception $e) {
-            return $this->errorResponse(500, $e->getMessage());
-        }
-    }
-
-    /**
-     * Paginate for the list of products
-     *
-     * @param  Builder  $listProduct
-     * @param  int|null $page
-     * @param  int|null $perPage
-     * @return JsonResponse
-     */
-    public function productPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse
-    {
-        $page = $page ?? 1;
-        $perPage = $perPage ?? 5;
-
-        $products = $listProduct->skip(($page - 1) * $perPage)->take($perPage)->get();
-        $nextProducts = $listProduct->skip($page * $perPage)->take($perPage)->get();
-
-        $prev = $page > 1 && $products->isNotEmpty();
-        $next = $nextProducts->isNotEmpty();
-
-        try {
-            $listProducts = $products->map(function($item, $index) use($page, $perPage) {
-                $item->category_name = $item->category->name;
-                $item->no = ($page - 1) * $perPage + 1 + $index;
-                unset($item->category);
-                return $item;
-            });
-
-            $newData = [
-                'products'=> $listProducts,
-                'prev' => $prev,
-                'next' => $next
-            ];
-
-            $message = 'Get list products successfully';
-
-            return $this->successResponse($newData, 200, $message);
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
