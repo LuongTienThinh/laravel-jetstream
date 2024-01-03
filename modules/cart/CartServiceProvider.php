@@ -22,6 +22,8 @@ class CartServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->mergeConfigFrom(__DIR__.'/config/cart-config.php', 'cart-config');
+        $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+        $this->loadTranslationsFrom(__DIR__.'/lang', 'cart');
         $this->loadRoutesFrom(__DIR__.'/routes/api.php');
         $this->loadViewsFrom(__DIR__.'/resources/views', 'Modules-Cart');
     }
