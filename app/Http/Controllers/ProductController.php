@@ -44,6 +44,7 @@ class ProductController extends Controller
         operationId: "getListProducts",
         description: "Get list products by search (default: empty) for each page (default: 1).",
         summary: "Get list products",
+        tags: ['products'],
         parameters: [
             new Parameter(
                 name: "search",
@@ -127,6 +128,7 @@ class ProductController extends Controller
                 ]
             )
         ),
+        tags: ['products'],
         responses: [
             new Response(
                 response: 200,
@@ -199,6 +201,7 @@ class ProductController extends Controller
                 ]
             )
         ),
+        tags: ['products'],
         parameters: [
             new Parameter(
                 name: "id",
@@ -256,6 +259,7 @@ class ProductController extends Controller
         operationId: "deleteProduct",
         description: "Delete a product's information in products table",
         summary: "Delete a product",
+        tags: ['products'],
         parameters: [
             new Parameter(
                 name: "id",

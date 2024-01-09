@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace Modules\Cart\src\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateProductRequest extends FormRequest
+class UpdateCartRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,10 @@ class UpdateProductRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'price' => 'required|numeric',
+            'cart_id' => 'required|string|max:255',
+            'product_id' => 'required|string|max:255',
             'quantity' => 'required|integer',
-            'category_id' => 'required|integer',
+            'total_price' => 'required|numeric',
         ];
     }
 }

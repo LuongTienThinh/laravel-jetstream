@@ -2,6 +2,7 @@
 
 namespace Modules\Cart;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
 class CartServiceProvider extends ServiceProvider
@@ -24,6 +25,7 @@ class CartServiceProvider extends ServiceProvider
         $this->mergeConfigFrom(__DIR__.'/config/cart-config.php', 'cart-config');
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
         $this->loadTranslationsFrom(__DIR__.'/lang', 'cart');
+        $this->loadRoutesFrom(__DIR__.'/routes/web.php');
         $this->loadRoutesFrom(__DIR__.'/routes/api.php');
         $this->loadViewsFrom(__DIR__.'/resources/views', 'Modules-Cart');
     }
