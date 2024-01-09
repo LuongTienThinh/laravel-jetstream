@@ -7,6 +7,9 @@
     "paths": {
         "/api/product/get-list": {
             "get": {
+                "tags": [
+                    "products"
+                ],
                 "summary": "Get list products",
                 "description": "Get list products by search (default: empty) for each page (default: 1).",
                 "operationId": "getListProducts",
@@ -74,6 +77,9 @@
         },
         "/api/product/create": {
             "post": {
+                "tags": [
+                    "products"
+                ],
                 "summary": "Create a product",
                 "description": "Create a product and add it into products table.",
                 "operationId": "createProduct",
@@ -144,6 +150,9 @@
         },
         "/api/product/edit/{id}": {
             "put": {
+                "tags": [
+                    "products"
+                ],
                 "summary": "Update a product",
                 "description": "Update a product's information in products table",
                 "operationId": "updateProduct",
@@ -224,6 +233,9 @@
         },
         "/api/product/delete/{id}": {
             "delete": {
+                "tags": [
+                    "products"
+                ],
                 "summary": "Delete a product",
                 "description": "Delete a product's information in products table",
                 "operationId": "deleteProduct",
@@ -247,6 +259,310 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Delete a product successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cart/{id}": {
+            "get": {
+                "tags": [
+                    "carts"
+                ],
+                "summary": "Get list cart products",
+                "description": "Get list products by search (default: empty) for each page (default: 1) in cart of user.",
+                "operationId": "getListCartProduct",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "int"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Get list products successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cart/create": {
+            "post": {
+                "tags": [
+                    "carts"
+                ],
+                "summary": "Add product to cart",
+                "description": "Add a product to cart of user.",
+                "operationId": "addProductToCart",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "cart_id": {
+                                        "type": "string",
+                                        "example": "10"
+                                    },
+                                    "product_id": {
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "quantity": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "total_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": "19900000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Add product to cart success."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cart/edit/{cart_id}-{product_id}": {
+            "put": {
+                "tags": [
+                    "carts"
+                ],
+                "summary": "Update a product",
+                "description": "Update a product from cart of user.",
+                "operationId": "updateCartProduct",
+                "parameters": [
+                    {
+                        "name": "cart_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "cart_id": {
+                                        "type": "string",
+                                        "example": "10"
+                                    },
+                                    "product_id": {
+                                        "type": "string",
+                                        "example": "1"
+                                    },
+                                    "quantity": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "total_price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": "19900000"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Update a product success."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cart/delete/{cart_id}-{product_id}": {
+            "delete": {
+                "tags": [
+                    "carts"
+                ],
+                "summary": "Remove product from cart",
+                "description": "Remove a product from cart of user.",
+                "operationId": "removeCartProduct",
+                "parameters": [
+                    {
+                        "name": "cart_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Remove product success."
                                         }
                                     },
                                     "type": "object"

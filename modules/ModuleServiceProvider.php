@@ -22,7 +22,9 @@ class ModuleServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $modules = [
-            'Modules\Cart\CartServiceProvider'
+            'Modules\Cart\CartServiceProvider',
+            'Modules\Cart\src\Providers\RouteServiceProvider',
+            'Modules\Cart\src\Providers\RepositoryServiceProvider',
         ];
 
         foreach ($modules as $module) {

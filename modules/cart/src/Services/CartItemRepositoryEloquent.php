@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Repositories;
+namespace Modules\Cart\src\Services;
 
-use App\Models\Product;
 use App\Traits\ApiResponseTrait;
 use App\Validators\ProductValidator;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Modules\Cart\src\Models\CartItem;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 
@@ -16,7 +16,7 @@ use Prettus\Repository\Eloquent\BaseRepository;
  *
  * @package namespace App\Repositories;
  */
-class ProductRepositoryEloquent extends BaseRepository implements ProductRepository
+class CartItemRepositoryEloquent extends BaseRepository implements CartItemRepository
 {
     use ApiResponseTrait;
 
@@ -27,7 +27,7 @@ class ProductRepositoryEloquent extends BaseRepository implements ProductReposit
      */
     public function model()
     {
-        return Product::class;
+        return CartItem::class;
     }
 
     /**
@@ -43,42 +43,31 @@ class ProductRepositoryEloquent extends BaseRepository implements ProductReposit
         $this->model->create($attributes);
     }
 
-    public function update(array $attributes, $id): bool
+    public function updateCartProduct(array $attributes, string $cartId, string $productId): mixed
     {
-        $product = $this->findById($id);
-        if ($product instanceof $this->model) {
-            $product->update($attributes);
-            return true;
-        }
-        return false;
+        return $this->model->where('cart_id', '=', $cartId)
+                           ->where('product_id', '=', $productId)
+                           ->update($attributes);
     }
 
-    public function delete($id): bool
+    public function deleteCartProduct(string $cartId, string $productId): mixed
     {
-        $product = $this->findById($id);
-        if ($product instanceof $this->model) {
-            $product->delete();
-            return true;
-        }
-        return false;
-    }
-
-    public function findById($id): mixed
-    {
-        return $this->model->findOrFail($id);
+        return $this->model->where('cart_id', '=', $cartId)
+                           ->where('product_id', '=', $productId)
+                           ->delete();
     }
 
     public function filterSearch(string $search): Builder
     {
-        return $this->model->where('name', 'like', '%' . $search . '%')->with('category');
+        return $this->model->where('name', 'like', '%' . $search . '%')->with(['cart', 'product']);
     }
 
-    public function getProductWith(): Builder
+    public function getCartProductWith(): Builder
     {
-        return $this->model->with('category');
+        return $this->model->with(['cart', 'product']);
     }
 
-    public function productPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse
+    public function cartProductPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse
     {
         $page = $page ?? 1;
         $perPage = $perPage ?? 5;
@@ -91,9 +80,10 @@ class ProductRepositoryEloquent extends BaseRepository implements ProductReposit
 
         try {
             $listProducts = $products->map(function($item, $index) use($page, $perPage) {
-                $item->category_name = $item->category->name;
+                $item->base_price = $item->product->price;
+                $item->name = $item->product->name;
+                $item->quantity_in_stock = $item->product->quantity;
                 $item->no = ($page - 1) * $perPage + 1 + $index;
-                unset($item->category);
                 return $item;
             });
 
