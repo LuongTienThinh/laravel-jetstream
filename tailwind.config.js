@@ -11,6 +11,7 @@ export default {
         './resources/views/**/*.blade.php',
         "./resources/**/*.js",
         "./resources/**/*.vue",
+        './modules/cart/resources/views/**/*.blade.php',
     ],
 
     theme: {

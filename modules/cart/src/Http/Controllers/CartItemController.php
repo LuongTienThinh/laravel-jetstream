@@ -5,6 +5,7 @@ namespace Modules\Cart\src\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cookie;
 use Modules\Cart\src\Http\Requests\UpdateCartRequest;
 use Modules\Cart\src\Services\CartItemRepository;
 use Exception;
@@ -29,12 +30,6 @@ class CartItemController extends Controller
         $this->cartItemRepository = $cartItemRepository;
     }
 
-    /**
-     * Add a product to cart
-     *
-     * @param  UpdateCartRequest $request
-     * @return JsonResponse
-     */
     #[Post(
         path: '/api/cart/create',
         operationId: "addProductToCart",
@@ -76,7 +71,24 @@ class CartItemController extends Controller
     public function store(UpdateCartRequest $request): JsonResponse
     {
         try {
-            $this->cartItemRepository->create($request->validated());
+            if ($request->get('cart_id') === 'null') {
+
+                $cart_list = [];
+                if ($request->hasCookie('cart-list')) {
+                    $cart_list = array_merge($cart_list, json_decode($request->cookie('cart-list')));
+                }
+
+                $cart_item = [
+                    'product_id' => $request->validated('product_id'),
+                    'quantity' => $request->validated('quantity'),
+                    'total_price' => $request->validated('total_price'),
+                ];
+                $cart_list[] = $cart_item;
+
+                return response()->json()->cookie('cart-list', json_encode($cart_list), 60);
+            } else {
+                $this->cartItemRepository->create($request->validated());
+            }
 
             $message = "Add product to cart success";
             return $this->successResponse(null, 200, $message);

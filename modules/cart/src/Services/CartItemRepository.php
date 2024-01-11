@@ -57,6 +57,15 @@ interface CartItemRepository extends RepositoryInterface
     public function getCartProductWith(): Builder;
 
     /**
+     * Handle data of list products before response api
+     *
+     * @param  array $listProduct
+     * @return array
+     */
+    public function handleCartDataNoLogin(array $listProduct): array;
+
+
+    /**
      * Paginate for the list of products
      *
      * @param  Builder  $listProduct

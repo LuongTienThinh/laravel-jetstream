@@ -4,8 +4,11 @@ namespace Modules\Cart\src\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponseTrait;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Modules\Cart\src\Models\Cart;
 use Modules\Cart\src\Services\CartRepository;
 use Modules\Cart\src\Services\CartItemRepository;
@@ -91,21 +94,35 @@ class CartController extends Controller
             ),
         ]
     )]
-    public function index(Request $request, string $id): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $cartUser = $this->cartRepository->findById($id);
-
-        if ($cartUser instanceof Cart) {
+        try {
             $search = $request->get('search');
             $page = $request->get('page');
 
-            if (isset($search)) {
-                $products = $this->cartItemRepository->filterSearch($search);
-                return $this->cartItemRepository->cartProductPagination($products, $page);
-            }
+//            dd($request->session()->all());
 
-            return $this->cartItemRepository->cartProductPagination($this->cartItemRepository->getCartProductWith(), $page);
+            if ($id === 'null') {
+                if ($request->hasCookie('cart-list')) {
+                    $products = json_decode($request->cookie('cart-list'));
+
+                    $products = $this->cartItemRepository->handleCartDataNoLogin($products);
+
+                    return $this->successResponse($products, 200, "Get list products successfully");
+                }
+                return $this->successResponse([], 200, "Get list products successfully");
+            } else {
+                $cartUser = $this->cartRepository->findById($id);
+
+                if (isset($search)) {
+                    $products = $this->cartItemRepository->filterSearch($search);
+                    return $this->cartItemRepository->cartProductPagination($products, $page);
+                }
+
+                return $this->cartItemRepository->cartProductPagination($this->cartItemRepository->getCartProductWith(), $page);
+            }
+        } catch (Exception $e) {
+            return $this->errorResponse(500, $e->getMessage());
         }
-        return $this->errorResponse(500, "An error was occurred");
     }
 }

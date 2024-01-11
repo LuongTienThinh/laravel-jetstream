@@ -46,7 +46,10 @@ $url = request()->path();
                             </li>
                         </ul>
                     </div>
-                    <div class="border-t-2 text-center font-black capitalize py-4 text-xl">total price: <span id="cart-total-price"></span></div>
+                    <div class="flex items-center justify-evenly border-t-2">
+                        <div class="text-center font-black capitalize py-4 text-xl w-3/5">total price: <span id="cart-total-price"></span></div>
+                        <a href="{{ route('checkout') }}" class="px-10 py-3 h-fit rounded bg-blue-400 text-white text-center">Check out</a>
+                    </div>
                     <div class="border-t-2 px-6 pt-4" id="pagination">
                     </div>
                 </div>
@@ -62,6 +65,14 @@ $url = request()->path();
     @endif
 </x-app-layout>
 <script>
+
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': csrfToken
+        }
+    });
 
     const handleEditCart = () => {
         const btnEdits = $('.btn-edit-cart');
@@ -207,9 +218,9 @@ $url = request()->path();
             search: '<?php echo $search; ?>'
         };
 
-        console.log(data);
+        console.log(csrfToken);
 
-        const url = `http://127.0.0.1:8000/api/cart/10?page=${data.page}&search=${data.search}`;
+        const url = `http://127.0.0.1:8000/api/cart?page=${data.page}&search=${data.search}`;
         try {
             const response = await $.ajax({
                 url: url,

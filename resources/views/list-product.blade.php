@@ -89,14 +89,12 @@ $url = request()->path();
 
         const handleSubmit = (item) => {
             const id = item.id.split('-')[1];
-            const cart_id = '{{ Auth::user()->cart->id }}';
+            const cart_id = '{{ Auth::user()->cart->id ?? 'null' }}';
 
             const [price, quantity] = [
                 $(`#total-price-${id}`).html(),
                 $(`#cart-quantity-${id}`).val(),
             ];
-
-            console.log(cart_id, id, quantity, price);
 
             const url = `http://127.0.0.1:8000/api/cart/create`;
 

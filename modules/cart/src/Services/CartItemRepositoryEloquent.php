@@ -4,9 +4,11 @@ namespace Modules\Cart\src\Services;
 
 use App\Traits\ApiResponseTrait;
 use App\Validators\ProductValidator;
+use App\Models\Product;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 use Modules\Cart\src\Models\CartItem;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
@@ -67,6 +69,20 @@ class CartItemRepositoryEloquent extends BaseRepository implements CartItemRepos
         return $this->model->with(['cart', 'product']);
     }
 
+    public function handleCartDataNoLogin(array $listProduct): array
+    {
+        return array_map(function($item) {
+            $product = Product::query()->find($item->product_id)->first();
+
+            $item->base_price = $product->price;
+            $item->name = $product->name;
+            $item->quantity_in_stock = $product->quantity;
+
+
+            return $item;
+        }, $listProduct);
+    }
+
     public function cartProductPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse
     {
         $page = $page ?? 1;
@@ -84,6 +100,8 @@ class CartItemRepositoryEloquent extends BaseRepository implements CartItemRepos
                 $item->name = $item->product->name;
                 $item->quantity_in_stock = $item->product->quantity;
                 $item->no = ($page - 1) * $perPage + 1 + $index;
+                unset($item->cart);
+                unset($item->product);
                 return $item;
             });
 
