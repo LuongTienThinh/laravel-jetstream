@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Cart\src\Services;
+namespace Modules\Cart\Services;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;

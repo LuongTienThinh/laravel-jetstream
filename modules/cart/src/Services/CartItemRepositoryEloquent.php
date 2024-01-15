@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Cart\src\Services;
+namespace Modules\Cart\Services;
 
 use App\Traits\ApiResponseTrait;
 use App\Validators\ProductValidator;
@@ -9,7 +9,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
-use Modules\Cart\src\Models\CartItem;
+use Modules\Cart\Models\CartItem;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 

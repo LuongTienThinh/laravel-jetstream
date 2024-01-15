@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Cart\src\Providers;
+namespace Modules\Cart\Providers;
 
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;

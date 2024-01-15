@@ -1,10 +1,10 @@
 <?php
 
-namespace Modules\Cart\src\Services;
+namespace Modules\Cart\Services;
 
 use App\Traits\ApiResponseTrait;
 use App\Validators\ProductValidator;
-use Modules\Cart\src\Models\Cart;
+use Modules\Cart\Models\Cart;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 

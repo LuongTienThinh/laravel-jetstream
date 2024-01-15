@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Cart\src\Http\Controllers\CartController;
+use Modules\Cart\Http\Controllers\CartController;
 
 Route::get('/cart', function () {
     return view('Modules-Cart::cart-detail');

@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-use Modules\Cart\src\Http\Controllers\CartController;
-use Modules\Cart\src\Http\Controllers\CartItemController;
+use Modules\Cart\Http\Controllers\CartController;
+use Modules\Cart\Http\Controllers\CartItemController;
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

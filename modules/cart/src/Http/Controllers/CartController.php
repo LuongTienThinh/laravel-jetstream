@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Cart\src\Http\Controllers;
+namespace Modules\Cart\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponseTrait;
@@ -9,9 +9,9 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
-use Modules\Cart\src\Models\Cart;
-use Modules\Cart\src\Services\CartRepository;
-use Modules\Cart\src\Services\CartItemRepository;
+use Modules\Cart\Models\Cart;
+use Modules\Cart\Services\CartRepository;
+use Modules\Cart\Services\CartItemRepository;
 use OpenApi\Attributes\Get;
 use OpenApi\Attributes\JsonContent;
 use OpenApi\Attributes\Parameter;

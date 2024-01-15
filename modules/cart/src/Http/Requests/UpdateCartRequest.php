@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Cart\src\Http\Requests;
+namespace Modules\Cart\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;

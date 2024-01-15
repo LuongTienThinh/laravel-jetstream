@@ -1,13 +1,13 @@
 <?php
 
-namespace Modules\Cart\src\Http\Controllers;
+namespace Modules\Cart\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cookie;
-use Modules\Cart\src\Http\Requests\UpdateCartRequest;
-use Modules\Cart\src\Services\CartItemRepository;
+use Modules\Cart\Http\Requests\UpdateCartRequest;
+use Modules\Cart\Services\CartItemRepository;
 use Exception;
 use OpenApi\Attributes\Delete;
 use OpenApi\Attributes\JsonContent;

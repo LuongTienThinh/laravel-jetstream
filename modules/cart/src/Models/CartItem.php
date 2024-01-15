@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Cart\src\Models;
+namespace Modules\Cart\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

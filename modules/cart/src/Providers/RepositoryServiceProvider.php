@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\Cart\src\Providers;
+namespace Modules\Cart\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Modules\Cart\src\Services\CartRepository;
-use Modules\Cart\src\Services\CartItemRepository;
-use Modules\Cart\src\Services\CartRepositoryEloquent;
-use Modules\Cart\src\Services\CartItemRepositoryEloquent;
+use Modules\Cart\Services\CartRepository;
+use Modules\Cart\Services\CartItemRepository;
+use Modules\Cart\Services\CartRepositoryEloquent;
+use Modules\Cart\Services\CartItemRepositoryEloquent;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
