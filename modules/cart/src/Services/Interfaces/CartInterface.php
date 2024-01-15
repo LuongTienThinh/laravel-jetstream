@@ -11,7 +11,7 @@ use Prettus\Repository\Contracts\RepositoryInterface;
  *
  * @package namespace App\Repositories;
  */
-interface CartService extends RepositoryInterface
+interface CartInterface extends RepositoryInterface
 {
     /**
      * Find a product by id

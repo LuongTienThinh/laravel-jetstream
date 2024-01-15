@@ -11,7 +11,7 @@ use Prettus\Repository\Contracts\RepositoryInterface;
  *
  * @package namespace App\Repositories;
  */
-interface CartItemService extends RepositoryInterface
+interface CartItemInterface extends RepositoryInterface
 {
 
     /**

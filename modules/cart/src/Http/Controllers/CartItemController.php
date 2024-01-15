@@ -5,7 +5,6 @@ namespace Modules\Cart\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Cookie;
 use Modules\Cart\Http\Requests\UpdateCartRequest;
 use Modules\Cart\Services\CartItemService;
 use Exception;
@@ -23,11 +22,11 @@ class CartItemController extends Controller
 {
     use ApiResponseTrait;
 
-    public CartItemService $cartItemRepository;
+    public CartItemService $cartItemService;
 
-    public function __construct(CartItemService $cartItemRepository)
+    public function __construct(CartItemService $cartItemService)
     {
-        $this->cartItemRepository = $cartItemRepository;
+        $this->cartItemService = $cartItemService;
     }
 
     #[Post(
@@ -87,7 +86,7 @@ class CartItemController extends Controller
 
                 return response()->json()->cookie('cart-list', json_encode($cart_list), 60);
             } else {
-                $this->cartItemRepository->create($request->validated());
+                $this->cartItemService->create($request->validated());
             }
 
             $message = "Add product to cart success";
@@ -164,7 +163,7 @@ class CartItemController extends Controller
     public function update(UpdateCartRequest $request, string $cartId, string $productId): JsonResponse
     {
         try {
-            $this->cartItemRepository->updateCartProduct($request->validated(), $cartId, $productId);
+            $this->cartItemService->updateCartProduct($request->validated(), $cartId, $productId);
 
             $message = "Update a product success";
             return $this->successResponse(null, 200, $message);
@@ -228,7 +227,7 @@ class CartItemController extends Controller
     public function destroy(string $cartId, string $productId): JsonResponse
     {
         try {
-            $this->cartItemRepository->deleteCartProduct($cartId, $productId);
+            $this->cartItemService->deleteCartProduct($cartId, $productId);
 
             $message = "Remove product success";
             return $this->successResponse(null, 200, $message);
