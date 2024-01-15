@@ -7,11 +7,8 @@ use App\Traits\ApiResponseTrait;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cookie;
-use Modules\Cart\Models\Cart;
-use Modules\Cart\Services\CartRepository;
-use Modules\Cart\Services\CartItemRepository;
+use Modules\Cart\Services\Interfaces\CartService;
+use Modules\Cart\Services\Interfaces\CartItemService;
 use OpenApi\Attributes\Get;
 use OpenApi\Attributes\JsonContent;
 use OpenApi\Attributes\Parameter;
@@ -23,13 +20,13 @@ class CartController extends Controller
 {
     use ApiResponseTrait;
 
-    public CartRepository $cartRepository;
-    public CartItemRepository $cartItemRepository;
+    public CartService $cartService;
+    public CartItemService $cartItemService;
 
-    public function __construct(CartRepository $cartRepository, CartItemRepository $cartItemRepository)
+    public function __construct(CartService $cartService, CartItemService $cartItemService)
     {
-        $this->cartRepository = $cartRepository;
-        $this->cartItemRepository = $cartItemRepository;
+        $this->cartService = $cartService;
+        $this->cartItemService = $cartItemService;
     }
 
     /**
@@ -94,32 +91,32 @@ class CartController extends Controller
             ),
         ]
     )]
-    public function index(Request $request): JsonResponse
+    public function index(Request $request, string $id): JsonResponse
     {
         try {
             $search = $request->get('search');
             $page = $request->get('page');
 
-//            dd($request->session()->all());
+//            dd(DB::table('sessions')->get);
 
             if ($id === 'null') {
                 if ($request->hasCookie('cart-list')) {
                     $products = json_decode($request->cookie('cart-list'));
 
-                    $products = $this->cartItemRepository->handleCartDataNoLogin($products);
+                    $products = $this->cartItemService->handleCartDataNoLogin($products);
 
                     return $this->successResponse($products, 200, "Get list products successfully");
                 }
                 return $this->successResponse([], 200, "Get list products successfully");
             } else {
-                $cartUser = $this->cartRepository->findById($id);
+                $cartUser = $this->cartService->findById($id);
 
                 if (isset($search)) {
-                    $products = $this->cartItemRepository->filterSearch($search);
-                    return $this->cartItemRepository->cartProductPagination($products, $page);
+                    $products = $this->cartItemService->filterSearch($search);
+                    return $this->cartItemService->cartProductPagination($products, $page);
                 }
 
-                return $this->cartItemRepository->cartProductPagination($this->cartItemRepository->getCartProductWith(), $page);
+                return $this->cartItemService->cartProductPagination($this->cartItemService->getCartProductWith(), $page);
             }
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());

@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Cart\Services;
+namespace Modules\Cart\Services\Interfaces;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -11,7 +11,7 @@ use Prettus\Repository\Contracts\RepositoryInterface;
  *
  * @package namespace App\Repositories;
  */
-interface CartRepository extends RepositoryInterface
+interface CartService extends RepositoryInterface
 {
     /**
      * Find a product by id

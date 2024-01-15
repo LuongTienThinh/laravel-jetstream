@@ -59,9 +59,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Modules\\Cart\\Providers\\CartServiceProvider",
-                "Modules\\Cart\\Providers\\RouteServiceProvider",
-                "Modules\\Cart\\Providers\\RepositoryServiceProvider"
+                "Modules\\Cart\\Providers\\CartServiceProvider"
             ]
         }
     },

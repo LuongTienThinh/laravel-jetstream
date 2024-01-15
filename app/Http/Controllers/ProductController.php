@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdateProductRequest;
 use App\Repositories\ProductRepository;
 use App\Traits\ApiResponseTrait;
+use App\Jobs\ProcessSendMail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -305,5 +306,12 @@ class ProductController extends Controller
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
+    }
+
+    public function sendWelcomeMail(): string
+    {
+        $mailJob = new ProcessSendMail();
+        dispatch($mailJob);
+        return "Test send mail";
     }
 }

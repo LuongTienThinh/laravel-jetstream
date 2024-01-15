@@ -41,3 +41,5 @@ Route::get('/dashboard', function () {
 Route::get('/list-product', function () {
     return view('list-product');
 })->name('list_product');
+
+Route::get('/send-mail', [ProductController::class, 'sendWelcomeMail']);

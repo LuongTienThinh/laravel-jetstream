@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Modules\Cart\Models\CartItem;
+use Modules\Cart\Services\Interfaces\CartItemService;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 
@@ -18,7 +19,7 @@ use Prettus\Repository\Eloquent\BaseRepository;
  *
  * @package namespace App\Repositories;
  */
-class CartItemRepositoryEloquent extends BaseRepository implements CartItemRepository
+class CartItemServiceEloquent extends BaseRepository implements CartItemService
 {
     use ApiResponseTrait;
 

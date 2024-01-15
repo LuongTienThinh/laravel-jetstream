@@ -5,6 +5,7 @@ namespace Modules\Cart\Services;
 use App\Traits\ApiResponseTrait;
 use App\Validators\ProductValidator;
 use Modules\Cart\Models\Cart;
+use Modules\Cart\Services\Interfaces\CartService;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 
@@ -13,7 +14,7 @@ use Prettus\Repository\Eloquent\BaseRepository;
  *
  * @package namespace App\Repositories;
  */
-class CartRepositoryEloquent extends BaseRepository implements CartRepository
+class CartServiceEloquent extends BaseRepository implements CartService
 {
     use ApiResponseTrait;
 

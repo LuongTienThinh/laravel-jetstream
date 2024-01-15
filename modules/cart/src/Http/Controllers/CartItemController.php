@@ -7,7 +7,7 @@ use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cookie;
 use Modules\Cart\Http\Requests\UpdateCartRequest;
-use Modules\Cart\Services\CartItemRepository;
+use Modules\Cart\Services\CartItemService;
 use Exception;
 use OpenApi\Attributes\Delete;
 use OpenApi\Attributes\JsonContent;
@@ -23,9 +23,9 @@ class CartItemController extends Controller
 {
     use ApiResponseTrait;
 
-    public CartItemRepository $cartItemRepository;
+    public CartItemService $cartItemRepository;
 
-    public function __construct(CartItemRepository $cartItemRepository)
+    public function __construct(CartItemService $cartItemRepository)
     {
         $this->cartItemRepository = $cartItemRepository;
     }
