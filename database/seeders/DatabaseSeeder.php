@@ -8,7 +8,7 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Category;
-use Modules\Cart\src\Models\Cart;
+use Modules\Cart\Models\Cart;
 use DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
-use Modules\Cart\src\Models\Cart;
+use Modules\Cart\Models\Cart;
 
 class User extends Authenticatable
 {

@@ -172,6 +172,8 @@ return [
         App\Providers\JetstreamServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
         \Modules\Cart\Providers\CartServiceProvider::class,
+        \Modules\Cart\Providers\RouteServiceProvider::class,
+        \Modules\Cart\Providers\RepositoryServiceProvider::class,
     ])->toArray(),
 
     /*
