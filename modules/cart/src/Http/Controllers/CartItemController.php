@@ -82,7 +82,18 @@ class CartItemController extends Controller
                     'quantity' => $request->validated('quantity'),
                     'total_price' => $request->validated('total_price'),
                 ];
-                $cart_list[] = $cart_item;
+
+                array_map(function ($item) use($cart_item) {
+                    if ($item->product_id == $cart_item['product_id']) {
+                        $item->quantity += $cart_item['quantity'];
+                        $item->total_price += $cart_item['total_price'];
+                    }
+                    return $item;
+                }, $cart_list);
+
+                if ($cart_list == json_decode($request->cookie('cart-list'))) {
+                    $cart_list[] = $cart_item;
+                }
 
                 return response()->json()->cookie('cart-list', json_encode($cart_list), 60);
             } else {

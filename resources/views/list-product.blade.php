@@ -34,8 +34,7 @@ $url = request()->path();
                                     class="absolute top-0 right-0 h-full bg-blue-400 text-white px-4 rounded-e-lg">Search</button>
 
                         </div>
-                        <button
-                            class="btn-add-modal px-6 py-2 rounded bg-blue-400 text-white">{{ __('New Product') }}</button>
+                        <div></div>
                     </div>
                     <div class="border-t-2">
                         <ul class="list-none p-4 overflow-y-auto" id="product-list">
@@ -65,6 +64,14 @@ $url = request()->path();
 </x-app-layout>
 
 <script>
+    const csrfToken = $('meta[name="csrf-token"]').attr('content');
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': csrfToken
+        }
+    });
+
     const showModal = (btn, modal, close, submit) => {
         $(btn).on('click', () => {
             $(modal).removeClass('hidden');
@@ -110,10 +117,10 @@ $url = request()->path();
                 }),
                 success: function(response) {
                     window.location.href = '{{ route('list_product') }}';
-                    console.log('Cập nhật thành công', response);
+                    console.log('Thêm thành công', response);
                 },
                 error: function(error) {
-                    console.error('Lỗi khi cập nhật', error);
+                    console.error('Lỗi khi thêm', error);
                 }
             });
         }

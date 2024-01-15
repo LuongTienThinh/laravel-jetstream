@@ -7,6 +7,7 @@ use App\Traits\ApiResponseTrait;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Modules\Cart\Services\CartService;
 use Modules\Cart\Services\CartItemService;
 use OpenApi\Attributes\Get;
@@ -33,7 +34,6 @@ class CartController extends Controller
      * Get list products in cart of user
      *
      * @param  Request $request
-     * @param  string  $id
      * @return JsonResponse
      */
     #[Get(
@@ -91,15 +91,12 @@ class CartController extends Controller
             ),
         ]
     )]
-    public function index(Request $request, string $id): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         try {
-            $search = $request->get('search');
             $page = $request->get('page');
 
-//            dd(DB::table('sessions')->get);
-
-            if ($id === 'null') {
+            if (!Auth::check()) {
                 if ($request->hasCookie('cart-list')) {
                     $products = json_decode($request->cookie('cart-list'));
 
@@ -109,14 +106,12 @@ class CartController extends Controller
                 }
                 return $this->successResponse([], 200, "Get list products successfully");
             } else {
-                $cartUser = $this->cartService->findById($id);
+                $cartId = Auth::user()->cart->id;
+                $products = $this->cartItemService->getCartProductByCartId($cartId)->get();
 
-                if (isset($search)) {
-                    $products = $this->cartItemService->filterSearch($search);
-                    return $this->cartItemService->cartProductPagination($products, $page);
-                }
+                $data = $this->cartItemService->handleDataBeforeResponse($products);
 
-                return $this->cartItemService->cartProductPagination($this->cartItemService->getCartProductWith(), $page);
+                return $this->successResponse($data, 200, "Get list products successfully");
             }
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());

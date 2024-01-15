@@ -4,6 +4,7 @@ namespace Modules\Cart\Services\Interfaces;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Collection;
 use Prettus\Repository\Contracts\RepositoryInterface;
 
 /**
@@ -50,11 +51,18 @@ interface CartItemInterface extends RepositoryInterface
     public function filterSearch(string $search): Builder;
 
     /**
-     * Insert category into products
-     *
+     * @param  string $id
      * @return Builder
      */
-    public function getCartProductWith(): Builder;
+    public function getCartProductByCartId(string $id): Builder;
+
+    /**
+     * Insert category into products
+     *
+     * @param  Builder $products
+     * @return Builder
+     */
+    public function getCartProductWith(Builder $products): Builder;
 
     /**
      * Handle data of list products before response api
@@ -63,6 +71,8 @@ interface CartItemInterface extends RepositoryInterface
      * @return array
      */
     public function handleCartDataNoLogin(array $listProduct): array;
+
+    public function handleDataBeforeResponse(Collection $products): array;
 
 
     /**
@@ -74,4 +84,11 @@ interface CartItemInterface extends RepositoryInterface
      * @return JsonResponse
      */
     public function cartProductPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse;
+
+    /**
+     * @param  string $cart_id
+     * @param  string $product_id
+     * @return bool
+     */
+    public function isInCart(string $cartId, string $productId): Bool;
 }

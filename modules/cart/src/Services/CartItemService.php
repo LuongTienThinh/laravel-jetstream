@@ -65,23 +65,43 @@ class CartItemService extends BaseRepository implements CartItemInterface
         return $this->model->where('name', 'like', '%' . $search . '%')->with(['cart', 'product']);
     }
 
-    public function getCartProductWith(): Builder
+    public function getCartProductByCartId(string $id): Builder
     {
-        return $this->model->with(['cart', 'product']);
+        return $this->getCartProductWith($this->model->where('cart_id', '=', $id));
+    }
+
+    public function getCartProductWith(Builder $products): Builder
+    {
+        return $products->with(['cart', 'product']);
     }
 
     public function handleCartDataNoLogin(array $listProduct): array
     {
-        return array_map(function($item) {
-            $product = Product::query()->find($item->product_id)->first();
+        return [
+            'products' => array_map(function($item) {
+                $product = Product::query()->where('id', '=', $item->product_id)->first();
 
-            $item->base_price = $product->price;
-            $item->name = $product->name;
-            $item->quantity_in_stock = $product->quantity;
+                $item->base_price = $product->price;
+                $item->name = $product->name;
+                $item->quantity_in_stock = $product->quantity;
 
+                return $item;
+            }, $listProduct)
+        ];
+    }
 
-            return $item;
-        }, $listProduct);
+    public function handleDataBeforeResponse(Collection $products): array
+    {
+        return [
+            'products' => $products->map(function($item) {
+                $item->base_price = $item->product->price;
+                $item->name = $item->product->name;
+                $item->quantity_in_stock = $item->product->quantity;
+                unset($item->cart);
+                unset($item->product);
+                return $item;
+            })
+        ];
     }
 
     public function cartProductPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse
@@ -96,18 +116,15 @@ class CartItemService extends BaseRepository implements CartItemInterface
         $next = $nextProducts->isNotEmpty();
 
         try {
-            $listProducts = $products->map(function($item, $index) use($page, $perPage) {
-                $item->base_price = $item->product->price;
-                $item->name = $item->product->name;
-                $item->quantity_in_stock = $item->product->quantity;
-                $item->no = ($page - 1) * $perPage + 1 + $index;
-                unset($item->cart);
-                unset($item->product);
-                return $item;
-            });
+            $listProducts = $this->handleDataBeforeResponse(
+                $products->map(function($item, $index) use($page, $perPage) {
+                    $item->no = ($page - 1) * $perPage + 1 + $index;
+                    return $item;
+                })
+            );
 
             $newData = [
-                'products'=> $listProducts,
+                'products'=> $listProducts['products'],
                 'prev' => $prev,
                 'next' => $next
             ];
@@ -118,5 +135,12 @@ class CartItemService extends BaseRepository implements CartItemInterface
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
+    }
+
+    public function isInCart(string $cartId, string $productId): Bool
+    {
+        $product = $this->model->newQuery()->where('cart_id', '=', $cartId)
+                                ->where('product_id', '=', $productId);
+        return $product instanceof CartItem;
     }
 }

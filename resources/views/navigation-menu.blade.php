@@ -134,6 +134,7 @@
                             <div class="border-t border-gray-200 dark:border-gray-600"></div>
 
                             <!-- Authentication -->
+                            @if(Auth::check())
                             <form method="POST" action="{{ route('logout') }}" x-data>
                                 @csrf
 
@@ -142,6 +143,15 @@
                                     {{ __('Log Out') }}
                                 </x-dropdown-link>
                             </form>
+                            @else
+                            <form method="POST" action="{{ route('login') }}" x-data>
+                                @csrf
+
+                                <x-dropdown-link href="{{ route('login') }}">
+                                    {{ __('Log In') }}
+                                </x-dropdown-link>
+                            </form>
+                            @endif
                         </x-slot>
                     </x-dropdown>
                 </div>
