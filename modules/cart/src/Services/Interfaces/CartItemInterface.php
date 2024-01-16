@@ -86,8 +86,8 @@ interface CartItemInterface extends RepositoryInterface
     public function cartProductPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse;
 
     /**
-     * @param  string $cart_id
-     * @param  string $product_id
+     * @param  string $cartId
+     * @param  string $productId
      * @return bool
      */
     public function isInCart(string $cartId, string $productId): Bool;

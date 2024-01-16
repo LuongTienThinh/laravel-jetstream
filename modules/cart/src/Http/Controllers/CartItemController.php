@@ -72,32 +72,38 @@ class CartItemController extends Controller
         try {
             if ($request->get('cart_id') === 'null') {
 
-                $cart_list = [];
+                $cartList = [];
                 if ($request->hasCookie('cart-list')) {
-                    $cart_list = array_merge($cart_list, json_decode($request->cookie('cart-list')));
+                    $cartList = array_merge($cartList, json_decode($request->cookie('cart-list')));
                 }
 
-                $cart_item = [
+                $cartItem = [
                     'product_id' => $request->validated('product_id'),
                     'quantity' => $request->validated('quantity'),
                     'total_price' => $request->validated('total_price'),
                 ];
 
-                array_map(function ($item) use($cart_item) {
-                    if ($item->product_id == $cart_item['product_id']) {
-                        $item->quantity += $cart_item['quantity'];
-                        $item->total_price += $cart_item['total_price'];
+                array_map(function ($item) use($cartItem) {
+                    if ($item->product_id == $cartItem['product_id']) {
+                        $item->quantity += $cartItem['quantity'];
+                        $item->total_price += $cartItem['total_price'];
                     }
                     return $item;
-                }, $cart_list);
+                }, $cartList);
 
-                if ($cart_list == json_decode($request->cookie('cart-list'))) {
-                    $cart_list[] = $cart_item;
+                if ($cartList == json_decode($request->cookie('cart-list'))) {
+                    $cartList[] = $cartItem;
                 }
 
-                return response()->json()->cookie('cart-list', json_encode($cart_list), 60);
+                return response()->json()->cookie('cart-list', json_encode($cartList), 60);
             } else {
-                $this->cartItemService->create($request->validated());
+                $cartId = $request->get('cart_id');
+                $productId = $request->get('product_id');
+                if($this->cartItemService->isInCart($cartId, $productId)) {
+                    $this->cartItemService->updateProductExistedInCart($request->validated(), $cartId, $productId);
+                } else {
+                    $this->cartItemService->create($request->validated());
+                }
             }
 
             $message = "Add product to cart success";

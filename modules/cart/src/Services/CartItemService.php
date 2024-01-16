@@ -53,6 +53,17 @@ class CartItemService extends BaseRepository implements CartItemInterface
                            ->update($attributes);
     }
 
+    public function updateProductExistedInCart(array $attributes, string $cartId, string $productId): mixed
+    {
+        $product = $this->model->where('cart_id', '=', $cartId)->where('product_id', '=', $productId)->first();
+
+        $attributes['quantity'] += $product->quantity;
+
+        return $this->model->where('cart_id', '=', $cartId)
+            ->where('product_id', '=', $productId)
+            ->update($attributes);
+    }
+
     public function deleteCartProduct(string $cartId, string $productId): mixed
     {
         return $this->model->where('cart_id', '=', $cartId)
@@ -140,7 +151,7 @@ class CartItemService extends BaseRepository implements CartItemInterface
     public function isInCart(string $cartId, string $productId): Bool
     {
         $product = $this->model->newQuery()->where('cart_id', '=', $cartId)
-                                ->where('product_id', '=', $productId);
+                                ->where('product_id', '=', $productId)->first();
         return $product instanceof CartItem;
     }
 }
