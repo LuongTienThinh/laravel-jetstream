@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
 use Modules\Cart\Services\CartService;
 use Modules\Cart\Services\CartItemService;
 use OpenApi\Attributes\Get;
@@ -37,37 +38,11 @@ class CartController extends Controller
      * @return JsonResponse
      */
     #[Get(
-        path: '/api/cart/{id}',
+        path: '/api/cart',
         operationId: "getListCartProduct",
         description: "Get list products by search (default: empty) for each page (default: 1) in cart of user.",
         summary: "Get list cart products",
         tags: ['carts'],
-        parameters: [
-            new Parameter(
-                name: "search",
-                in: "query",
-                required: false,
-                schema: new Schema(
-                    type: "string",
-                )
-            ),
-            new Parameter(
-                name: "page",
-                in: "query",
-                required: false,
-                schema: new Schema(
-                    type: "int",
-                )
-            ),
-            new Parameter(
-                name: "id",
-                in: "path",
-                required: true,
-                schema: new Schema(
-                    type: "string",
-                )
-            )
-        ],
         responses: [
             new Response(
                 response: 200,
@@ -94,8 +69,6 @@ class CartController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $page = $request->get('page');
-
             if (!Auth::check()) {
                 if ($request->hasCookie('cart-list')) {
                     $products = json_decode($request->cookie('cart-list'));
@@ -107,11 +80,30 @@ class CartController extends Controller
                 return $this->successResponse([], 200, "Get list products successfully");
             } else {
                 $cartId = Auth::user()->cart->id;
-                $products = $this->cartItemService->getCartProductByCartId($cartId)->get();
 
+                if ($request->hasCookie('cart-list')) {
+                    $products = json_decode($request->cookie('cart-list'));
+
+                    $products = $this->cartItemService->handleCartDataNoLogin($products);
+
+                    foreach ($products['products'] as $item) {
+                        $cartItem = [
+                            'cart_id' => $cartId,
+                            'product_id' => $item->product_id,
+                            'quantity' => $item->quantity,
+                            'total_price' => $item->total_price
+                        ];
+                        if($this->cartItemService->isInCart($cartId, $item->product_id)) {
+                            $this->cartItemService->updateProductExistedInCart($cartItem, $cartId, $item->product_id);
+                        } else {
+                            $this->cartItemService->create($cartItem);
+                        }
+                    }
+                }
+                $products = $this->cartItemService->getCartProductByCartId($cartId)->get();
                 $data = $this->cartItemService->handleDataBeforeResponse($products);
 
-                return $this->successResponse($data, 200, "Get list products successfully");
+                return $this->successResponse($data, 200, "Get list products successfully")->cookie(Cookie::forget('cart-list'));
             }
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());

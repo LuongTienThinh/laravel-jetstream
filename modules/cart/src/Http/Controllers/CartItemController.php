@@ -5,6 +5,8 @@ namespace Modules\Cart\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponseTrait;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Modules\Cart\Http\Requests\UpdateCartRequest;
 use Modules\Cart\Services\CartItemService;
 use Exception;
@@ -95,7 +97,8 @@ class CartItemController extends Controller
                     $cartList[] = $cartItem;
                 }
 
-                return response()->json()->cookie('cart-list', json_encode($cartList), 60);
+                $message = "Add product to cart success";
+                return $this->successResponse(null, 200, $message)->cookie('cart-list', json_encode($cartList), 60);
             } else {
                 $cartId = $request->get('cart_id');
                 $productId = $request->get('product_id');
@@ -117,12 +120,11 @@ class CartItemController extends Controller
      * Update a product in cart
      *
      * @param  UpdateCartRequest $request
-     * @param  string $cartId
      * @param  string $productId
      * @return JsonResponse
      */
     #[Put(
-        path: '/api/cart/edit/{cart_id}-{product_id}',
+        path: '/api/cart/edit/{product_id}',
         operationId: "updateCartProduct",
         description: "Update a product from cart of user.",
         summary: "Update a product",
@@ -139,14 +141,6 @@ class CartItemController extends Controller
         ),
         tags: ['carts'],
         parameters: [
-            new Parameter(
-                name: "cart_id",
-                in: "path",
-                required: true,
-                schema: new Schema(
-                    type: "string"
-                )
-            ),
             new Parameter(
                 name: "product_id",
                 in: "path",
@@ -177,13 +171,35 @@ class CartItemController extends Controller
             ),
         ]
     )]
-    public function update(UpdateCartRequest $request, string $cartId, string $productId): JsonResponse
+    public function update(UpdateCartRequest $request, string $productId): JsonResponse
     {
         try {
-            $this->cartItemService->updateCartProduct($request->validated(), $cartId, $productId);
+            if (!Auth::check()) {
+                $cartList = json_decode($request->cookie('cart-list'));
 
-            $message = "Update a product success";
-            return $this->successResponse(null, 200, $message);
+                $cartItem = [
+                    'product_id' => $request->validated('product_id'),
+                    'quantity' => $request->validated('quantity'),
+                    'total_price' => $request->validated('total_price'),
+                ];
+
+                array_map(function ($item) use($cartItem) {
+                    if ($item->product_id == $cartItem['product_id']) {
+                        $item->quantity = $cartItem['quantity'];
+                        $item->total_price = $cartItem['total_price'];
+                    }
+                    return $item;
+                }, $cartList);
+
+                $message = "Update a product success";
+                return $this->successResponse(null, 200, $message)->cookie('cart-list', json_encode($cartList), 60);
+            } else {
+                $cartId = Auth::user()->cart->id;
+                $this->cartItemService->updateCartProduct($request->validated(), $cartId, $productId);
+
+                $message = "Update a product success";
+                return $this->successResponse(null, 200, $message);
+            }
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
@@ -192,25 +208,17 @@ class CartItemController extends Controller
     /**
      * Remove a product from cart
      *
-     * @param  string $cartId
+     * @param  Request $request
      * @param  string $productId
      * @return JsonResponse
      */
     #[Delete(
-        path: '/api/cart/delete/{cart_id}-{product_id}',
+        path: '/api/cart/delete/{product_id}',
         operationId: "removeCartProduct",
         description: "Remove a product from cart of user.",
         summary: "Remove product from cart",
         tags: ['carts'],
         parameters: [
-            new Parameter(
-                name: "cart_id",
-                in: "path",
-                required: true,
-                schema: new Schema(
-                    type: "string"
-                )
-            ),
             new Parameter(
                 name: "product_id",
                 in: "path",
@@ -241,13 +249,25 @@ class CartItemController extends Controller
             ),
         ]
     )]
-    public function destroy(string $cartId, string $productId): JsonResponse
+    public function destroy(Request $request, string $productId): JsonResponse
     {
         try {
-            $this->cartItemService->deleteCartProduct($cartId, $productId);
+            if (!Auth::check()) {
+                $cartList = json_decode($request->cookie('cart-list'));
 
-            $message = "Remove product success";
-            return $this->successResponse(null, 200, $message);
+                $cartList = array_filter($cartList, function ($item) use ($productId) {
+                    return $item->product_id != $productId;
+                });
+
+                $message = "Remove a product success";
+                return $this->successResponse(null, 200, $message)->cookie('cart-list', json_encode($cartList), 60);
+            } else {
+                $cartId = Auth::user()->cart->id;
+                $this->cartItemService->deleteCartProduct($cartId, $productId);
+
+                $message = "Remove product success";
+                return $this->successResponse(null, 200, $message);
+            }
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
