@@ -86,7 +86,7 @@ $url = request()->path();
                     $(`#cart-quantity-${cart_id}-${product_id}`).val(),
                 ];
 
-                const url = `http://127.0.0.1:8000/api/cart/edit/${cart_id}-${product_id}`;
+                const url = `http://127.0.0.1:8000/api/cart/edit/${product_id}`;
                 $.ajax({
                     url: url,
                     type: 'PUT',
@@ -116,7 +116,7 @@ $url = request()->path();
                 const cart_id = this.id.split('-')[1];
                 const product_id = this.id.split('-')[2];
 
-                const url = `http://127.0.0.1:8000/api/cart/delete/${cart_id}-${product_id}`;
+                const url = `http://127.0.0.1:8000/api/cart/delete/${product_id}`;
                 $.ajax({
                     url: url,
                     type: 'DELETE',
@@ -189,7 +189,7 @@ $url = request()->path();
                             </li>`);
         }
 
-        products.forEach((item) => {
+        products && products.forEach((item) => {
             cartTotalPrice += item.total_price;
             const htmlContent =
                 `<li class="p-2 flex flex-nowrap items-center w-full">
@@ -217,8 +217,6 @@ $url = request()->path();
             page: parseInt('<?php echo $page; ?>'),
             search: '<?php echo $search; ?>'
         };
-
-        console.log(csrfToken);
 
         const url = `http://127.0.0.1:8000/api/cart?page=${data.page}&search=${data.search}`;
         try {

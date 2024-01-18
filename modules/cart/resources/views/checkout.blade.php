@@ -131,7 +131,7 @@ $url = request()->path();
                                         </li>`);
         }
 
-        products.forEach((item) => {
+        products && products.forEach((item) => {
             cartTotalPrice += item.total_price;
             const htmlContent =
                 `<li class="p-2 flex flex-nowrap items-center w-full text-lg">
