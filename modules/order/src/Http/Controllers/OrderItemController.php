@@ -3,6 +3,7 @@
 namespace Modules\Order\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Repositories\ProductRepositoryEloquent;
 use App\Traits\ApiResponseTrait;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -22,11 +23,19 @@ class OrderItemController extends Controller
 
     public CartItemService $cartItemService;
 
-    public function __construct(OrderService $orderService, OrderItemService $orderItemService, CartItemService $cartItemService)
+    public ProductRepositoryEloquent $productService;
+
+    public function __construct(
+        OrderService $orderService,
+        OrderItemService $orderItemService,
+        CartItemService $cartItemService,
+        ProductRepositoryEloquent $productService
+    )
     {
         $this->orderService = $orderService;
         $this->orderItemService = $orderItemService;
         $this->cartItemService = $cartItemService;
+        $this->productService = $productService;
     }
 
     public function store(Request $request)
@@ -42,7 +51,17 @@ class OrderItemController extends Controller
                 ]);
 
                 foreach ($orderDetails['products'] as $item) {
-                    dd($item);
+//                    dd($item);
+                    $this->orderItemService->create([
+                        'order_id' => $order->id,
+                        'product_id' => $item['product_id'],
+                        'quantity' => $item['quantity'],
+                        'total_price' => $item['total_price'],
+                    ]);
+                    $this->cartItemService->deleteCartProduct($item['cart_id'], $item['product_id']);
+                    $this->productService->update([
+                        'quantity' => $item['quantity_in_stock'] - $item['quantity']
+                    ], $item['product_id']);
                 }
 
                 return $this->successResponse(null, 200, 'Create success');
@@ -54,7 +73,7 @@ class OrderItemController extends Controller
     }
 }
 //  Khi thanh toán, thực hiện các công việc:
-//  - tạo order
-//  - thêm sản phẩm vào order
-//  - xoá sản phẩm khỏi cart
-//  - giảm số lượng sản phẩm
+//  - tạo order (v)
+//  - thêm sản phẩm vào order (v)
+//  - xoá sản phẩm khỏi cart (v)
+//  - giảm số lượng sản phẩm (v)

@@ -48,7 +48,11 @@ $url = request()->path();
                     </div>
                     <div class="flex items-center justify-evenly border-t-2 pt-2">
                         <div class="text-center font-black capitalize py-4 text-xl w-3/5">total price: <span id="cart-total-price"></span></div>
-                        <a href="{{ route('checkout') }}" class="px-10 py-3 h-fit rounded bg-blue-400 text-white text-center">Check out</a>
+                        @auth
+                        <a href="{{ route('checkout') }}" id="btn-checkout" class="px-10 py-3 h-fit rounded bg-blue-400 text-white text-center">Check out</a>
+                        @else
+                        <a href="{{ route('login') }}" class="px-10 py-3 h-fit rounded bg-blue-400 text-white text-center">Check out</a>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -112,10 +116,9 @@ $url = request()->path();
         const btnRemoves = $('.btn-remove-cart');
         btnRemoves.each(function() {
             $(this).on('click', () => {
-                const cartId = this.id.split('-')[1];
                 const productId = this.id.split('-')[2];
 
-                const url = `http://127.0.0.1:8000/api/cart/delete/${product_id}`;
+                const url = `http://127.0.0.1:8000/api/cart/delete/${productId}`;
 
                 $.ajax({
                     url: url,
@@ -180,16 +183,19 @@ $url = request()->path();
         const productList = $("#product-list");
         let cartTotalPrice = 0;
 
-        if (products) {
+        if (products && products.length > 0) {
             productList.html(`<li class="p-2 flex flex-nowrap items-center w-full font-black">
                                 <span class="w-[30%] text-center">Product Name</span>
                                 <span class="w-[20%] text-center">Quantity</span>
                                 <span class="w-[20%] text-center">Price</span>
                                 <span class="action w-[30%] text-center">Action</span>
                             </li>`);
+            $('#btn-checkout').removeClass('pointer-events-none opacity-75');
+        } else {
+            $('#btn-checkout').addClass('pointer-events-none opacity-75');
         }
 
-        products && products.forEach((item) => {
+        products && products.length > 0 && products.forEach((item) => {
             cartTotalPrice += item.total_price;
             const htmlContent =
                 `<li class="p-2 flex flex-nowrap items-center w-full">
