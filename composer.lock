@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c645672c5fbb2bca05709e6e3030c018",
+    "content-hash": "1f2a8a056c1c51b4d04a9e684f65d830",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -186,16 +186,16 @@
         },
         {
             "name": "cslant/laravel-telegram-git-notifier",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cslant/laravel-telegram-git-notifier.git",
-                "reference": "5346a367589bd195f4fb6bd856d5abce902bee80"
+                "reference": "7cc08f8139254b777db37dde83f2a822d3179a91"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cslant/laravel-telegram-git-notifier/zipball/5346a367589bd195f4fb6bd856d5abce902bee80",
-                "reference": "5346a367589bd195f4fb6bd856d5abce902bee80",
+                "url": "https://api.github.com/repos/cslant/laravel-telegram-git-notifier/zipball/7cc08f8139254b777db37dde83f2a822d3179a91",
+                "reference": "7cc08f8139254b777db37dde83f2a822d3179a91",
                 "shasum": ""
             },
             "require": {
@@ -255,9 +255,15 @@
             ],
             "support": {
                 "issues": "https://github.com/cslant/laravel-telegram-git-notifier/issues",
-                "source": "https://github.com/cslant/laravel-telegram-git-notifier/tree/v1.0.1"
+                "source": "https://github.com/cslant/laravel-telegram-git-notifier/tree/v1.0.2"
             },
-            "time": "2023-11-24T18:41:12+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/tanhongit",
+                    "type": "github"
+                }
+            ],
+            "time": "2024-01-12T09:48:29+00:00"
         },
         {
             "name": "cslant/telegram-git-notifier",
@@ -617,16 +623,16 @@
         },
         {
             "name": "doctrine/inflector",
-            "version": "2.0.8",
+            "version": "2.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/inflector.git",
-                "reference": "f9301a5b2fb1216b2b08f02ba04dc45423db6bff"
+                "reference": "2930cd5ef353871c821d5c43ed030d39ac8cfe65"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/inflector/zipball/f9301a5b2fb1216b2b08f02ba04dc45423db6bff",
-                "reference": "f9301a5b2fb1216b2b08f02ba04dc45423db6bff",
+                "url": "https://api.github.com/repos/doctrine/inflector/zipball/2930cd5ef353871c821d5c43ed030d39ac8cfe65",
+                "reference": "2930cd5ef353871c821d5c43ed030d39ac8cfe65",
                 "shasum": ""
             },
             "require": {
@@ -688,7 +694,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/inflector/issues",
-                "source": "https://github.com/doctrine/inflector/tree/2.0.8"
+                "source": "https://github.com/doctrine/inflector/tree/2.0.9"
             },
             "funding": [
                 {
@@ -704,7 +710,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-06-16T13:40:37+00:00"
+            "time": "2024-01-15T18:05:13+00:00"
         },
         {
             "name": "doctrine/lexer",

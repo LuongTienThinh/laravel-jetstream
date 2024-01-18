@@ -2,14 +2,13 @@
 
 namespace Database\Seeders;
 
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Category;
-use Modules\Cart\Models\Cart;
 use DB;
+use Modules\Cart\Models\Cart;
+use Modules\Order\Models\PaymentMethod;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -26,6 +25,7 @@ class DatabaseSeeder extends Seeder
         DB::table('products')->delete();
         DB::table('categories')->delete();
         DB::table('users')->delete();
+        DB::table('payment_methods')->delete();
 
         // // Create random data
         // Models\Category::factory(10)->create();
@@ -80,6 +80,12 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Todor Pelagos', 'price' => 99000000, 'quantity' => 2, 'category_id' => 5,  'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Lenovo xiaoxin pad 2022', 'price' => 3190000, 'quantity' => 10, 'category_id' => 2,  'created_at' => now(), 'updated_at' => now()],
             ['name' => 'PC TTC39 gaming', 'price' => 21720000, 'quantity' => 8, 'category_id' => 4,  'created_at' => now(), 'updated_at' => now()],
+        ]);
+
+        // Create payment methods
+        PaymentMethod::insert([
+            ['method' => 'cash', 'created_at' => now(), 'updated_at' => now()],
+            ['method' => 'master card', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

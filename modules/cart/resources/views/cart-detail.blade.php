@@ -46,11 +46,9 @@ $url = request()->path();
                             </li>
                         </ul>
                     </div>
-                    <div class="flex items-center justify-evenly border-t-2">
+                    <div class="flex items-center justify-evenly border-t-2 pt-2">
                         <div class="text-center font-black capitalize py-4 text-xl w-3/5">total price: <span id="cart-total-price"></span></div>
                         <a href="{{ route('checkout') }}" class="px-10 py-3 h-fit rounded bg-blue-400 text-white text-center">Check out</a>
-                    </div>
-                    <div class="border-t-2 px-6 pt-4" id="pagination">
                     </div>
                 </div>
             </div>
@@ -78,22 +76,22 @@ $url = request()->path();
         const btnEdits = $('.btn-edit-cart');
         btnEdits.each(function () {
             $(this).on('click', () => {
-                const cart_id = this.id.split('-')[1];
-                const product_id = this.id.split('-')[2];
+                const cartId = this.id.split('-')[1];
+                const productId = this.id.split('-')[2];
 
                 const [price, quantity] = [
-                    $(`#price-${product_id}`).html(),
-                    $(`#cart-quantity-${cart_id}-${product_id}`).val(),
+                    $(`#price-${productId}`).html(),
+                    $(`#cart-quantity-${cartId}-${productId}`).val(),
                 ];
 
-                const url = `http://127.0.0.1:8000/api/cart/edit/${cart_id}-${product_id}`;
+                const url = `http://127.0.0.1:8000/api/cart/edit/${cartId}-${productId}`;
                 $.ajax({
                     url: url,
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify({
-                        cart_id,
-                        product_id,
+                        cart_id: cartId,
+                        product_id: productId,
                         quantity: parseInt(quantity),
                         total_price: parseFloat(price),
                     }),
@@ -113,10 +111,10 @@ $url = request()->path();
         const btnRemoves = $('.btn-remove-cart');
         btnRemoves.each(function() {
             $(this).on('click', () => {
-                const cart_id = this.id.split('-')[1];
-                const product_id = this.id.split('-')[2];
+                const cartId = this.id.split('-')[1];
+                const productId = this.id.split('-')[2];
 
-                const url = `http://127.0.0.1:8000/api/cart/delete/${cart_id}-${product_id}`;
+                const url = `http://127.0.0.1:8000/api/cart/delete/${cartId}-${productId}`;
                 $.ajax({
                     url: url,
                     type: 'DELETE',
@@ -138,7 +136,7 @@ $url = request()->path();
 
     const handleChangeQuantity = (event, basePrice, baseQuantity) => {
         const id = event.target.id.split('-')[3];
-        const cart_id = event.target.id.split('-')[2];
+        const cartId = event.target.id.split('-')[2];
 
         const productPriceHtml = $(`#price-${id}`);
 
@@ -150,9 +148,9 @@ $url = request()->path();
         handleUpdateCartPrice(currCartPrice - prevPrice + currPrice);
 
         if (parseInt(event.target.value) !== baseQuantity) {
-            $(`#edit-${cart_id}-${id}`).removeClass('hidden');
+            $(`#edit-${cartId}-${id}`).removeClass('hidden');
         } else {
-            $(`#edit-${cart_id}-${id}`).addClass('hidden');
+            $(`#edit-${cartId}-${id}`).addClass('hidden');
         }
     }
 
@@ -217,8 +215,6 @@ $url = request()->path();
             page: parseInt('<?php echo $page; ?>'),
             search: '<?php echo $search; ?>'
         };
-
-        console.log(csrfToken);
 
         const url = `http://127.0.0.1:8000/api/cart?page=${data.page}&search=${data.search}`;
         try {

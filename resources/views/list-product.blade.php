@@ -96,7 +96,7 @@ $url = request()->path();
 
         const handleSubmit = (item) => {
             const id = item.id.split('-')[1];
-            const cart_id = '{{ Auth::user()->cart->id ?? 'null' }}';
+            const cartId = '{{ Auth::user()->cart->id ?? 'null' }}';
 
             const [price, quantity] = [
                 $(`#total-price-${id}`).html(),
@@ -110,7 +110,7 @@ $url = request()->path();
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    cart_id,
+                    cart_id: cartId,
                     product_id: id,
                     quantity: parseInt(quantity),
                     total_price: parseFloat(price),
