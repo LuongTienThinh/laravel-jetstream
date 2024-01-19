@@ -4,16 +4,14 @@ namespace App\Repositories;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
-use Prettus\Repository\Contracts\RepositoryInterface;
 
 /**
  * Interface ProductRepository.
  *
  * @package namespace App\Repositories;
  */
-interface ProductRepository extends RepositoryInterface
+interface ProductRepository
 {
-
     /**
      * Create a product
      *

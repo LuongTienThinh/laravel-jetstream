@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Traits\ApiResponseTrait;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Exception;
@@ -103,5 +106,10 @@ class CategoryController extends Controller
         $category->delete();
 
         return response()->json(['message' => 'Success.']);
+    }
+
+    public function viewCategory(): View|Application|Factory|string|null
+    {
+        return view('category');
     }
 }

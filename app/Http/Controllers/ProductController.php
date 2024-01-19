@@ -6,6 +6,9 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Repositories\ProductRepository;
 use App\Traits\ApiResponseTrait;
 use App\Jobs\ProcessSendMail;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -183,8 +186,8 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  Request $request
-     * @param  string  $id
+     * @param  UpdateProductRequest $request
+     * @param  string $id
      * @return JsonResponse
      */
     #[Put(
@@ -306,6 +309,16 @@ class ProductController extends Controller
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
+    }
+
+    public function viewProduct(): View|Application|Factory|string|null
+    {
+        return view('product');
+    }
+
+    public function viewListProduct(): View|Application|Factory|string|null
+    {
+        return view('list-product');
     }
 
     public function sendWelcomeMail(): string
