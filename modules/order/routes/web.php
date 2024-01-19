@@ -1,9 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Order\Http\Controllers\OrderController;
 
 Route::middleware('web')->group(function () {
-    Route::get('/checkout', function () {
-        return view('Modules-Order::checkout');
-    })->name('checkout');
+    Route::get('/checkout', [OrderController::class, 'viewOrder'])->name('checkout');
 });

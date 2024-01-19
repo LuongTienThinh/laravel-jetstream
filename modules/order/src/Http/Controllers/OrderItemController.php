@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Repositories\ProductRepositoryEloquent;
 use App\Traits\ApiResponseTrait;
 use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Modules\Cart\Services\CartItemService;
@@ -51,14 +50,13 @@ class OrderItemController extends Controller
                 ]);
 
                 foreach ($orderDetails['products'] as $item) {
-//                    dd($item);
                     $this->orderItemService->create([
                         'order_id' => $order->id,
                         'product_id' => $item['product_id'],
                         'quantity' => $item['quantity'],
                         'total_price' => $item['total_price'],
                     ]);
-                    $this->cartItemService->deleteCartProduct($item['cart_id'], $item['product_id']);
+                    $this->cartItemService->deleteCartItem($item['cart_id'], $item['product_id']);
                     $this->productService->update([
                         'quantity' => $item['quantity_in_stock'] - $item['quantity']
                     ], $item['product_id']);

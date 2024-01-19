@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
 use Modules\Order\Http\Controllers\OrderItemController;
 use Modules\Order\Http\Controllers\PaymentMethodController;
 
