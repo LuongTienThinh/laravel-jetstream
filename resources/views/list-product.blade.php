@@ -102,7 +102,7 @@ $url = request()->path();
                 $(`#cart-quantity-${id}`).val(),
             ];
 
-            const url = `http://127.0.0.1:8000/api/cart/create`;
+            const url = `/api/cart/create`;
 
             $.ajax({
                 url: url,
@@ -231,7 +231,7 @@ $url = request()->path();
     }
 
     const getAllCategories = async () => {
-        const url = 'http://127.0.0.1:8000/api/category';
+        const url = '/api/category';
         let result = null;
         try {
             result = await $.ajax({
@@ -252,7 +252,7 @@ $url = request()->path();
             search: '<?php echo $search; ?>'
         };
 
-        const url = `http://127.0.0.1:8000/api/product/get-list?page=${data.page}&search=${data.search}`;
+        const url = `/api/product/get-list?page=${data.page}&search=${data.search}`;
         try {
             const categories = await getAllCategories();
             const response = await $.ajax({
@@ -272,7 +272,7 @@ $url = request()->path();
     getAllProducts();
 
     const getProductsFiltered = async (searchContent) => {
-        const response = await fetch(`http://127.0.0.1:8000/api/product?search=${searchContent}&page=1`);
+        const response = await fetch(`/api/product?search=${searchContent}&page=1`);
         return await response.json();
     }
 

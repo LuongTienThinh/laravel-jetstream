@@ -93,7 +93,7 @@
         });
 
         finishCheckout.on('click', async () => {
-            const url = `http://127.0.0.1:8000/api/payment/create-order`;
+            const url = `/api/payment/create-order`;
             $.ajax({
                 url: url,
                 method: 'POST',
@@ -154,7 +154,7 @@
     }
 
     const getProductsInCart = async () => {
-        const url = `http://127.0.0.1:8000/api/cart`;
+        const url = `/api/cart`;
         try {
             const response = await $.ajax({
                 url: url,
@@ -198,7 +198,7 @@
     }
 
     const getPaymentMethods = async () => {
-        const url = `http://127.0.0.1:8000/api/payment/method`;
+        const url = `/api/payment/method`;
         try {
             const response = await $.ajax({
                 url: url,
