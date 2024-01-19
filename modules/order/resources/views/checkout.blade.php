@@ -1,22 +1,7 @@
-<?php
-$page = 1;
-$search = '';
-
-if (isset($_GET['page'])) {
-    $page = $_GET['page'];
-}
-
-if (isset($_GET['search'])) {
-    $search = $_GET['search'];
-}
-
-$url = request()->path();
-
-?>
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Product') }}
+            {{ __('Checkout') }}
         </h2>
     </x-slot>
 
@@ -169,12 +154,7 @@ $url = request()->path();
     }
 
     const getProductsInCart = async () => {
-        const data = {
-            page: parseInt('<?php echo $page; ?>'),
-            search: '<?php echo $search; ?>'
-        };
-
-        const url = `http://127.0.0.1:8000/api/cart?page=${data.page}&search=${data.search}`;
+        const url = `http://127.0.0.1:8000/api/cart`;
         try {
             const response = await $.ajax({
                 url: url,
