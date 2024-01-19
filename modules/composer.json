@@ -1,0 +1,24 @@
+{
+    "name": "laravel/cart",
+    "type": "project",
+    "description": "The skeleton application for the Cart module.",
+    "require": {
+        "darkaonline/l5-swagger": "^8.5",
+        "zircote/swagger-php": "^4.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Cart": "cart/src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Modules\\Cart\\Providers\\CartServiceProvider",
+                "Modules\\Cart\\Providers\\RouteServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -2,14 +2,14 @@
 
 namespace App\Repositories;
 
-use Exception;
-use Illuminate\Http\JsonResponse;
-use Prettus\Repository\Eloquent\BaseRepository;
-use Prettus\Repository\Criteria\RequestCriteria;
 use App\Models\Product;
-use App\Validators\ProductValidator;
-use Illuminate\Database\Eloquent\Builder;
 use App\Traits\ApiResponseTrait;
+use App\Validators\ProductValidator;
+use Exception;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
+use Prettus\Repository\Criteria\RequestCriteria;
+use Prettus\Repository\Eloquent\BaseRepository;
 
 /**
  * Class ProductRepositoryEloquent.

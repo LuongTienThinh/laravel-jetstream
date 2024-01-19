@@ -25,10 +25,6 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-    
     Route::get('/product', function () {
         return view('product');
     })->name('product_web');
@@ -37,3 +33,13 @@ Route::middleware([
         return view('category');
     })->name('category_web');
 });
+
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->name('dashboard');
+
+Route::get('/list-product', function () {
+    return view('list-product');
+})->name('list_product');
+
+Route::get('/send-mail', [ProductController::class, 'sendWelcomeMail']);

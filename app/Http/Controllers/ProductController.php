@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdateProductRequest;
 use App\Repositories\ProductRepository;
 use App\Traits\ApiResponseTrait;
+use App\Jobs\ProcessSendMail;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use OpenApi\Attributes\Delete;
 use OpenApi\Attributes\Get;
 use OpenApi\Attributes\Parameter;
@@ -44,6 +46,7 @@ class ProductController extends Controller
         operationId: "getListProducts",
         description: "Get list products by search (default: empty) for each page (default: 1).",
         summary: "Get list products",
+        tags: ['products'],
         parameters: [
             new Parameter(
                 name: "search",
@@ -127,6 +130,7 @@ class ProductController extends Controller
                 ]
             )
         ),
+        tags: ['products'],
         responses: [
             new Response(
                 response: 200,
@@ -199,6 +203,7 @@ class ProductController extends Controller
                 ]
             )
         ),
+        tags: ['products'],
         parameters: [
             new Parameter(
                 name: "id",
@@ -256,6 +261,7 @@ class ProductController extends Controller
         operationId: "deleteProduct",
         description: "Delete a product's information in products table",
         summary: "Delete a product",
+        tags: ['products'],
         parameters: [
             new Parameter(
                 name: "id",
@@ -300,5 +306,12 @@ class ProductController extends Controller
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
         }
+    }
+
+    public function sendWelcomeMail(): string
+    {
+        $mailJob = new ProcessSendMail();
+        dispatch($mailJob);
+        return "Test send mail";
     }
 }

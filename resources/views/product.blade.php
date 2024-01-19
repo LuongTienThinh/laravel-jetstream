@@ -345,9 +345,7 @@ $url = request()->path();
             page: parseInt('<?php echo $page; ?>'),
             search: '<?php echo $search; ?>'
         };
-        console.log(data);
 
-        const queryString = new URLSearchParams(data).toString();
         const url = `http://127.0.0.1:8000/api/product/get-list?page=${data.page}&search=${data.search}`;
         try {
             const categories = await getAllCategories();
