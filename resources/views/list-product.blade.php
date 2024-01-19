@@ -96,7 +96,6 @@ $url = request()->path();
 
         const handleSubmit = (item) => {
             const id = item.id.split('-')[1];
-            const cartId = '{{ Auth::user()->cart->id ?? 'null' }}';
 
             const [price, quantity] = [
                 $(`#total-price-${id}`).html(),
@@ -110,7 +109,6 @@ $url = request()->path();
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    cart_id: cartId,
                     product_id: id,
                     quantity: parseInt(quantity),
                     total_price: parseFloat(price),
@@ -173,7 +171,7 @@ $url = request()->path();
     const renderProducts = (products) => {
         const productList = $("#product-list");
 
-        if (products) {
+        if (products && products.length > 0) {
             productList.html(`<li class="p-2 flex flex-nowrap items-center w-[130%] font-black">
                                 <span class="w-[10%]">No</span>
                                 <span class="w-[30%] text-center">Product Name</span>
@@ -184,7 +182,7 @@ $url = request()->path();
                             </li>`);
         }
 
-        products.forEach((item) => {
+        products && products.length > 0 && products.forEach((item) => {
             const htmlContent =
                 `<li class="p-2 flex flex-nowrap items-center w-[130%]">
                     <span class="w-[10%]">${item.no}</span>

@@ -12,6 +12,9 @@ use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use Modules\Cart\Models\Cart;
 
+/**
+ * @property Cart cart
+ */
 class User extends Authenticatable
 {
     use HasApiTokens;

@@ -1,22 +1,7 @@
-<?php
-$page = 1;
-$search = '';
-
-if (isset($_GET['page'])) {
-    $page = $_GET['page'];
-}
-
-if (isset($_GET['search'])) {
-    $search = $_GET['search'];
-}
-
-$url = request()->path();
-
-?>
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Product') }}
+            {{ __('Cart') }}
         </h2>
     </x-slot>
 
@@ -24,17 +9,8 @@ $url = request()->path();
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-xl sm:rounded-lg">
                 <div class="product-wrap p-4">
-                    <div class="flex justify-between items-center mb-6">
-                        <span>{{ __('List Products In Cart') }}</span>
-                        <div class="relative w-[50%]">
-                            <label for="search"></label>
-                            <input class="border-gray-400 focus:outline-0 focus:ring-0 rounded-lg w-full" type="text"
-                                   name="search" id="search" placeholder="Search here...">
-                            <button id="search-product"
-                                    class="absolute top-0 right-0 h-full bg-blue-400 text-white px-4 rounded-e-lg">Search</button>
-
-                        </div>
-                        <div></div>
+                    <div class="mb-6">
+                        <div class="text-center text-3xl tracking-wider font-black">{{ __('List Products In Cart') }}</div>
                     </div>
                     <div class="border-t-2">
                         <ul class="list-none p-4 overflow-y-auto" id="product-list">
@@ -46,13 +22,11 @@ $url = request()->path();
                             </li>
                         </ul>
                     </div>
-                    <div class="flex items-center justify-evenly border-t-2 pt-2">
+                    <div class="flex items-center justify-evenly border-t-2">
                         <div class="text-center font-black capitalize py-4 text-xl w-3/5">total price: <span id="cart-total-price"></span></div>
-                        @auth
-                        <a href="{{ route('checkout') }}" id="btn-checkout" class="px-10 py-3 h-fit rounded bg-blue-400 text-white text-center">Check out</a>
-                        @else
-                        <a href="{{ route('login') }}" class="px-10 py-3 h-fit rounded bg-blue-400 text-white text-center">Check out</a>
-                        @endif
+                        <a href="@auth {{ route('checkout') }} @else {{ route('login') }} @endif" id="btn-checkout" class="px-10 py-3 h-fit rounded bg-blue-400 text-white text-center">Check out</a>
+                    </div>
+                    <div class="border-t-2 px-6 pt-4" id="pagination">
                     </div>
                 </div>
             </div>
@@ -81,22 +55,20 @@ $url = request()->path();
         btnEdits.each(function () {
             $(this).on('click', () => {
                 const cartId = this.id.split('-')[1];
-                const productId = this.id.split('-')[2];
+                const cartItemId = this.id.split('-')[2];
 
                 const [price, quantity] = [
-                    $(`#price-${productId}`).html(),
-                    $(`#cart-quantity-${cartId}-${productId}`).val(),
+                    $(`#price-${cartItemId}`).html(),
+                    $(`#cart-quantity-${cartId}-${cartItemId}`).val(),
                 ];
 
-                const url = `http://127.0.0.1:8000/api/cart/edit/${product_id}`;
-
+                const url = `http://127.0.0.1:8000/api/cart/edit/${cartItemId}`;
                 $.ajax({
                     url: url,
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify({
-                        cart_id: cartId,
-                        product_id: productId,
+                        product_id: cartItemId,
                         quantity: parseInt(quantity),
                         total_price: parseFloat(price),
                     }),
@@ -116,10 +88,9 @@ $url = request()->path();
         const btnRemoves = $('.btn-remove-cart');
         btnRemoves.each(function() {
             $(this).on('click', () => {
-                const productId = this.id.split('-')[2];
+                const cartItemId = this.id.split('-')[2];
 
-                const url = `http://127.0.0.1:8000/api/cart/delete/${productId}`;
-
+                const url = `http://127.0.0.1:8000/api/cart/delete/${cartItemId}`;
                 $.ajax({
                     url: url,
                     type: 'DELETE',
@@ -157,26 +128,6 @@ $url = request()->path();
         } else {
             $(`#edit-${cartId}-${id}`).addClass('hidden');
         }
-    }
-
-    const paginationProduct = (paginate, searchContent) => {
-        const paginationHtml = $('#pagination');
-
-        const htmlPrev = paginate.prev ?
-            `<a href="<?php echo $url; ?>?page=<?php echo $page - 1; ?>${searchContent ? `&search=${searchContent}` : ''}" rel="prev" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">« Previous</a>` :
-            `<span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md">« Previous</span>`;
-
-        const htmlNext = paginate.next ?
-            `<a href="<?php echo $url; ?>?page=<?php echo $page + 1; ?>${searchContent ? `&search=${searchContent}` : ''}" rel="next" class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-500 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150">Next »</a>` :
-            `<span class="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-default leading-5 rounded-md">Next »</span>`;
-
-        const htmlPaginate =
-            `<nav role="navigation" aria-label="Pagination Navigation" class="flex justify-between">
-                ${htmlPrev}
-                ${htmlNext}
-            </nav>`;
-
-        paginationHtml.html(paginationHtml.html() + htmlPaginate);
     }
 
     const renderProducts = (products) => {
@@ -219,12 +170,7 @@ $url = request()->path();
     }
 
     const getProductsInCart = async () => {
-        const data = {
-            page: parseInt('<?php echo $page; ?>'),
-            search: '<?php echo $search; ?>'
-        };
-
-        const url = `http://127.0.0.1:8000/api/cart?page=${data.page}&search=${data.search}`;
+        const url = `http://127.0.0.1:8000/api/cart`;
         try {
             const response = await $.ajax({
                 url: url,
@@ -241,37 +187,4 @@ $url = request()->path();
         }
     }
     getProductsInCart();
-
-    const getProductsFiltered = async (searchContent) => {
-        const response = await fetch(`http://127.0.0.1:8000/api/product?search=${searchContent}&page=1`);
-        return await response.json();
-    }
-
-    const search = async () => {
-        const categories = await getAllCategories();
-
-        const searchContent = $('#search');
-
-        try {
-            const result = await getProductsFiltered(searchContent.val());
-
-            $('#pagination').html("");
-
-            renderProducts(result.data.products, categories.data);
-            paginationProduct(result.data, searchContent.val());
-
-            searchContent.val('');
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    }
-
-    $('#search-product').click(search);
-
-    $('#search').keyup(function(event) {
-        if (event.which === 13) {
-            event.preventDefault();
-            $('#search-product').click();
-        }
-    });
 </script>

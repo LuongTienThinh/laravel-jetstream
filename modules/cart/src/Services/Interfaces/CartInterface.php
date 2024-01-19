@@ -2,16 +2,12 @@
 
 namespace Modules\Cart\Services\Interfaces;
 
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\JsonResponse;
-use Prettus\Repository\Contracts\RepositoryInterface;
-
 /**
  * Interface ProductRepository.
  *
  * @package namespace App\Repositories;
  */
-interface CartInterface extends RepositoryInterface
+interface CartInterface
 {
     /**
      * Find a product by id

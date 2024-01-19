@@ -3,90 +3,70 @@
 namespace Modules\Cart\Services;
 
 use App\Traits\ApiResponseTrait;
-use App\Validators\ProductValidator;
 use App\Models\Product;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cookie;
+use Modules\Cart\Http\Requests\UpdateCartRequest;
 use Modules\Cart\Models\CartItem;
 use Modules\Cart\Services\Interfaces\CartItemInterface;
-use Prettus\Repository\Criteria\RequestCriteria;
-use Prettus\Repository\Eloquent\BaseRepository;
 
 /**
  * Class ProductRepositoryEloquent.
  *
  * @package namespace App\Repositories;
  */
-class CartItemService extends BaseRepository implements CartItemInterface
+class CartItemService implements CartItemInterface
 {
     use ApiResponseTrait;
 
-    /**
-     * Specify Model class name
-     *
-     * @return string
-     */
-    public function model()
-    {
-        return CartItem::class;
-    }
-
-    /**
-     * Boot up the repository, pushing criteria
-     */
-    public function boot()
-    {
-        $this->pushCriteria(app(RequestCriteria::class));
-    }
-
     public function create(array $attributes): void
     {
-        $this->model->create($attributes);
+        CartItem::query()->create($attributes);
     }
 
-    public function updateCartProduct(array $attributes, string $cartId, string $productId): mixed
+    public function updateCartItem(array $attributes, string $cartId, string $cartItemId): int
     {
-        return $this->model->where('cart_id', '=', $cartId)
-                           ->where('product_id', '=', $productId)
-                           ->update($attributes);
+        return CartItem::query()->where('cart_id', '=', $cartId)
+                                ->where('product_id', '=', $cartItemId)
+                                ->update($attributes);
     }
 
-    public function updateProductExistedInCart(array $attributes, string $cartId, string $productId): mixed
+    public function updateCartItemExistedInCart(array $attributes, string $cartId, string $cartItemId): int
     {
-        $product = $this->model->where('cart_id', '=', $cartId)->where('product_id', '=', $productId)->first();
+        $product = CartItem::query()->where('cart_id', '=', $cartId)
+                                    ->where('product_id', '=', $cartItemId)
+                                    ->first();
 
         $attributes['quantity'] += $product->quantity;
 
-        return $this->model->where('cart_id', '=', $cartId)
-            ->where('product_id', '=', $productId)
-            ->update($attributes);
+        return CartItem::query()->where('cart_id', '=', $cartId)
+                                ->where('product_id', '=', $cartItemId)
+                                ->update($attributes);
     }
 
-    public function deleteCartProduct(string $cartId, string $productId): mixed
+    public function deleteCartItem(string $cartId, string $cartItemId): mixed
     {
-        return $this->model->where('cart_id', '=', $cartId)
-                           ->where('product_id', '=', $productId)
-                           ->delete();
+        return CartItem::query()->where('cart_id', '=', $cartId)
+                                ->where('product_id', '=', $cartItemId)
+                                ->delete();
     }
 
-    public function filterSearch(string $search): Builder
+    public function getCartItemByCartId(string $id): Builder
     {
-        return $this->model->where('name', 'like', '%' . $search . '%')->with(['cart', 'product']);
+        return $this->getCartItemRelationship(CartItem::query()->where('cart_id', '=', $id));
     }
 
-    public function getCartProductByCartId(string $id): Builder
+    public function getCartItemRelationship(Builder $cartItems): Builder
     {
-        return $this->getCartProductWith($this->model->where('cart_id', '=', $id));
+        return $cartItems->with(['cart', 'product']);
     }
 
-    public function getCartProductWith(Builder $products): Builder
-    {
-        return $products->with(['cart', 'product']);
-    }
-
-    public function handleCartDataNoLogin(array $listProduct): array
+    public function handleCartDataNoLogin(array $cartItems): array
     {
         return [
             'products' => array_map(function($item) {
@@ -97,7 +77,7 @@ class CartItemService extends BaseRepository implements CartItemInterface
                 $item->quantity_in_stock = $product->quantity;
 
                 return $item;
-            }, $listProduct)
+            }, $cartItems)
         ];
     }
 
@@ -115,43 +95,144 @@ class CartItemService extends BaseRepository implements CartItemInterface
         ];
     }
 
-    public function cartProductPagination(Builder $listProduct, int $page = null, int $perPage = null): JsonResponse
+    public function isCartItemInCart(string $cartId, string $productId): Bool
     {
-        $page = $page ?? 1;
-        $perPage = $perPage ?? 5;
-
-        $products = $listProduct->skip(($page - 1) * $perPage)->take($perPage)->get();
-        $nextProducts = $listProduct->skip($page * $perPage)->take($perPage)->get();
-
-        $prev = $page > 1 && $products->isNotEmpty();
-        $next = $nextProducts->isNotEmpty();
-
-        try {
-            $listProducts = $this->handleDataBeforeResponse(
-                $products->map(function($item, $index) use($page, $perPage) {
-                    $item->no = ($page - 1) * $perPage + 1 + $index;
-                    return $item;
-                })
-            );
-
-            $newData = [
-                'products'=> $listProducts['products'],
-                'prev' => $prev,
-                'next' => $next
-            ];
-
-            $message = 'Get list products successfully';
-
-            return $this->successResponse($newData, 200, $message);
-        } catch (Exception $e) {
-            return $this->errorResponse(500, $e->getMessage());
-        }
+        $product = CartItem::query()->where('cart_id', '=', $cartId)
+                                    ->where('product_id', '=', $productId)
+                                    ->first();
+        return $product instanceof CartItem;
     }
 
-    public function isInCart(string $cartId, string $productId): Bool
+    public function getCartItemsNoLogin(Request $request): JsonResponse
     {
-        $product = $this->model->newQuery()->where('cart_id', '=', $cartId)
-                                ->where('product_id', '=', $productId)->first();
-        return $product instanceof CartItem;
+        if ($request->hasCookie('cart-list')) {
+            $products = json_decode($request->cookie('cart-list'));
+
+            $products = $this->handleCartDataNoLogin($products);
+
+            return $this->successResponse($products, 200, "Get list cart items success");
+        }
+        return $this->successResponse([], 200, "Get list cart items success");
+    }
+
+    public function getCartItemsLogged(Request $request): JsonResponse
+    {
+        $cartId = Auth::user()->cart->id;
+
+        if ($request->hasCookie('cart-list')) {
+            $products = json_decode($request->cookie('cart-list'));
+
+            $products = $this->handleCartDataNoLogin($products);
+
+            foreach ($products['products'] as $item) {
+                $cartItem = [
+                    'cart_id' => $cartId,
+                    'product_id' => $item->product_id,
+                    'quantity' => $item->quantity,
+                    'total_price' => $item->total_price
+                ];
+                if($this->isCartItemInCart($cartId, $item->product_id)) {
+                    $this->updateCartItemExistedInCart($cartItem, $cartId, $item->product_id);
+                } else {
+                    $this->create($cartItem);
+                }
+            }
+        }
+        $products = $this->getCartItemByCartId($cartId)->get();
+        $data = $this->handleDataBeforeResponse($products);
+
+        return $this->successResponse($data, 200, "Get list cart items success")
+                    ->cookie(Cookie::forget('cart-list'));
+    }
+
+    public function addCartItemNoLogin(UpdateCartRequest $request): JsonResponse
+    {
+        $cartList = [];
+        if ($request->hasCookie('cart-list')) {
+            $cartList = array_merge($cartList, json_decode($request->cookie('cart-list')));
+        }
+
+        $cartItem = $request->validated();
+
+        array_map(function ($item) use($cartItem) {
+            if ($item->product_id == $cartItem['product_id']) {
+                $item->quantity += $cartItem['quantity'];
+                $item->total_price += $cartItem['total_price'];
+            }
+            return $item;
+        }, $cartList);
+
+        if ($cartList == json_decode($request->cookie('cart-list'))) {
+            $cartList[] = $cartItem;
+        }
+
+        $message = "Add cart item to cart success";
+        return $this->successResponse(null, 200, $message)
+                    ->cookie('cart-list', json_encode($cartList), 60);
+    }
+
+    public function addCartItemLogged(UpdateCartRequest $request): JsonResponse
+    {
+        $cartId = Auth::user()->cart->id;
+        $productId = $request->get('product_id');
+
+        if($this->isCartItemInCart($cartId, $productId)) {
+            $this->updateCartItemExistedInCart($request->validated(), $cartId, $productId);
+        } else {
+            $this->create($request->validated());
+        }
+
+        $message = "Add cart item to cart success";
+        return $this->successResponse(null, 200, $message);
+    }
+
+    public function updateCartItemNoLogin(UpdateCartRequest $request, string $cartItemId): JsonResponse
+    {
+        $cartList = json_decode($request->cookie('cart-list'));
+
+        $cartItem = $request->validated();
+
+        array_map(function ($item) use($cartItem) {
+            if ($item->product_id == $cartItem['product_id']) {
+                $item->quantity = $cartItem['quantity'];
+                $item->total_price = $cartItem['total_price'];
+            }
+            return $item;
+        }, $cartList);
+
+        $message = "Update a cart item success";
+        return $this->successResponse(null, 200, $message)
+                    ->cookie('cart-list', json_encode($cartList), 60);
+    }
+
+    public function updateCartItemLogged(UpdateCartRequest $request, string $cartItemId): JsonResponse
+    {
+        $cartId = Auth::user()->cart->id;
+        $this->updateCartItem($request->validated(), $cartId, $cartItemId);
+
+        $message = "Update a cart item success";
+        return $this->successResponse(null, 200, $message);
+    }
+
+    public function deleteCartItemNoLogin(Request $request, string $productId): JsonResponse
+    {
+        $cartList = json_decode($request->cookie('cart-list'));
+
+        $cartList = array_filter($cartList, function ($item) use ($productId) {
+            return $item->product_id != $productId;
+        });
+
+        $message = "Remove a cart item success";
+        return $this->successResponse(null, 200, $message)
+                    ->cookie('cart-list', json_encode($cartList), 60);
+    }
+
+    public function deleteCartItemLogged(string $productId): JsonResponse
+    {
+        $cartId = Auth::user()->cart->id;
+        $this->deleteCartItem($cartId, $productId);
+
+        $message = "Remove a cart item success";
+        return $this->successResponse(null, 200, $message);
     }
 }

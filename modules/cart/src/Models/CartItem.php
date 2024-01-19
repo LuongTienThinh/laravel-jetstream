@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Product;
 
+/**
+ * @property Cart cart
+ * @property Product product
+ */
 class CartItem extends Model
 {
     use HasFactory;
