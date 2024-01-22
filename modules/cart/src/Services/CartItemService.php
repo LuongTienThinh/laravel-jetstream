@@ -179,7 +179,10 @@ class CartItemService implements CartItemInterface
         if($this->isCartItemInCart($cartId, $productId)) {
             $this->updateCartItemExistedInCart($request->validated(), $cartId, $productId);
         } else {
-            $this->create($request->validated());
+            $this->create([
+                'cart_id' => $cartId,
+                ...$request->validated()
+            ]);
         }
 
         $message = "Add cart item to cart success";

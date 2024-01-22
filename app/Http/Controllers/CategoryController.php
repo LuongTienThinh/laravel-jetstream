@@ -41,6 +41,7 @@ class CategoryController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     *
      * @param  Request $request
      * @return JsonResponse
      */
@@ -73,6 +74,7 @@ class CategoryController extends Controller
 
     /**
      * Update the specified resource in storage.
+     *
      * @param  Request $request
      * @param  string  $id
      * @return JsonResponse
@@ -92,6 +94,7 @@ class CategoryController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     *
      * @param  string $id
      * @return JsonResponse
      */

@@ -58,7 +58,7 @@
         btnAdd.on('click', () => {
             const name = $(`#create-name`).val();
 
-            const url = 'http://127.0.0.1:8000/api/category/create';
+            const url = '/api/category/create';
 
             $.ajax({
                 url: url,
@@ -97,7 +97,7 @@
 
                 const name = $(`#edit-name-${id}`).val();
 
-                const url = `http://127.0.0.1:8000/api/category/edit/${id}`;
+                const url = `/api/category/edit/${id}`;
 
                 $.ajax({
                     url: url,
@@ -124,7 +124,7 @@
             $(this).on('click', () => {
                 const id = this.id.split('-')[1];
 
-                const url = `http://127.0.0.1:8000/api/category/delete/${id}`;
+                const url = `/api/category/delete/${id}`;
                 $.ajax({
                     url: url,
                     type: 'DELETE',
@@ -211,7 +211,7 @@
     }
 
     const getAllCategories = async () => {
-        const url = 'http://127.0.0.1:8000/api/category';
+        const url = '/api/category';
         try {
             const response = await $.ajax({
                 url: url,
