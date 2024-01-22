@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Modules\Order\Services\OrderService;
 
 class OrderController extends Controller
@@ -18,7 +19,7 @@ class OrderController extends Controller
 
     public function __construct(OrderService $orderService)
     {
-        $this->$orderService = $orderService;
+        $this->orderService = $orderService;
     }
 
     /**
@@ -28,6 +29,7 @@ class OrderController extends Controller
      */
     public function viewOrder(): View|Application|Factory|string|null
     {
-        return view('Modules-Order::checkout');
+        $user = Auth::user();
+        return view('Modules-Order::checkout')->with('user', $user);
     }
 }

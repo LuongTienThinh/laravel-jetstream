@@ -24,16 +24,51 @@
                     <div class="text-end"><button id="submit-step-1" class="submit-step px-10 py-4 h-fit rounded bg-blue-400 text-white text-center">Next</button></div>
                 </div>
                 <div id="step-2" class="step-content hidden bill-wrap p-4">
-                    <h2 class="uppercase text-center font-black text-4xl mb-6">payment method</h2>
-                    <div id="payment-method" class="border-t-2 py-4 text-xl flex flex-col gap-2">
+                    <h2 class="uppercase text-center font-black text-4xl mb-6">address</h2>
+                    <div id="address" class="border-t-2 py-4 text-xl flex items-center flex-wrap gap-y-4">
+                        <div class="flex justify-center items-center w-1/2">
+                            <label class="me-4 w-1/4" for="provinces">Province:</label>
+                            <select class="w-3/5" name="provinces" id="provinces">
+                                <option value="" hidden selected>Select the provinces</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-center items-center w-1/2">
+                            <label class="me-4 w-1/4" for="districts">District:</label>
+                            <select class="w-3/5" name="districts" id="districts" disabled>
+                                <option value="" hidden selected>Select the districts</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-center items-center w-1/2">
+                            <label class="me-4 w-1/4" for="wards">Ward:</label>
+                            <select class="w-3/5" name="wards" id="wards" disabled>
+                                <option value="" hidden selected>Select the wards</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-center items-center w-1/2">
+                            <label class="me-4 w-1/4" for="number-address">Address</label>
+                            <input class="w-3/5" type="text" name="number-address" id="number-address" placeholder="Enter your number address, street" disabled>
+                        </div>
                     </div>
                     <div class="text-end pt-4 border-t-2"><button id="submit-step-2" class="submit-step px-10 py-4 h-fit rounded bg-blue-400 text-white text-center">Next</button></div>
                 </div>
                 <div id="step-3" class="step-content hidden bill-wrap p-4">
+                    <h2 class="uppercase text-center font-black text-4xl mb-6">payment method</h2>
+                    <div id="payment-method" class="border-t-2 py-4 text-xl flex flex-col gap-2">
+                    </div>
+                    <div class="text-end pt-4 border-t-2"><button id="submit-step-3" class="submit-step px-10 py-4 h-fit rounded bg-blue-400 text-white text-center">Next</button></div>
+                </div>
+                <div id="step-4" class="step-content hidden bill-wrap p-4">
                     <h2 class="uppercase text-center font-black text-4xl mb-6">invoice payment</h2>
                     <div class="border-t-2 text-xl py-4">
-                        <div>Name: {{ Auth::user()->name }}</div>
-                        <div>Email: {{ Auth::user()->email }}</div>
+                        <div>Name: {{ $user->name }}</div>
+                        <div>Email: {{ $user->email }}</div>
+                        <div>
+                            Address:
+                            <span id="user-number_address">{{ $user->number_address }},</span>
+                            <span id="user-ward"></span>
+                            <span id="user-district"></span>
+                            <span id="user-province"></span>
+                        </div>
                     </div>
                     <div class="text-xl">List products</div>
                     <div class="border-t-2">
@@ -47,7 +82,7 @@
                         </ul>
                     </div>
                     <div class="border-t-2 text-end font-black capitalize pt-4 text-xl">total price: <span id="cart-total-price-confirmed"></span></div>
-                    <div class="text-end font-black capitalize py-4 text-xl">payment method: <span id="payment-method-step-3"></span></div>
+                    <div class="text-end font-black capitalize py-4 text-xl">payment method: <span id="payment-method-step-4"></span></div>
                     <div class="text-end"><button id="finish-checkout" class="px-10 py-4 h-fit rounded bg-blue-400 text-white text-center">Finish</button></div>
                 </div>
             </div>
@@ -84,16 +119,44 @@
                 $(`#step-${step}`).addClass('hidden');
                 $(`#step-${step + 1}`).removeClass('hidden');
 
-                if (step === 2) {
+                if (step === 3) {
                     const method = paymentMethods.find(item => item.id === orderData.payment_method_id).method;
-                    console.log(orderData);
-                    $('#payment-method-step-3').html(method);
+                    $('#payment-method-step-4').html(method);
+                } else if (step === 2) {
+                    const province = $('#provinces');
+                    const district = $('#districts');
+                    const ward = $('#wards');
+                    const numberAddress = $('#number-address');
+                    const data = {
+                        'province': province.val(),
+                        'district': district.val(),
+                        'ward': ward.val(),
+                        'number_address': numberAddress.val(),
+                    }
+                    const url = `/api/user/address/update`;
+                    $.ajax({
+                        url: url,
+                        method: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify(data),
+
+                        success: function(response) {
+                            console.log('Cập nhật địa chỉ thành công', response);
+
+                            $('#user-ward').html(ward.children(':selected').text() + ',');
+                            $('#user-district').html(district.children(':selected').text() + ',');
+                            $('#user-province').html(province.children(':selected').text());
+                        },
+                        error: function(error) {
+                            console.error('Lỗi khi cập nhật địa chỉ', error);
+                        }
+                    });
                 }
             });
         });
 
         finishCheckout.on('click', async () => {
-            const url = `http://127.0.0.1:8000/api/payment/create-order`;
+            const url = `/api/payment/create-order`;
             $.ajax({
                 url: url,
                 method: 'POST',
@@ -101,7 +164,6 @@
                 data: JSON.stringify(orderData),
 
                 success: function(response) {
-                    window.location.href = '{{ route('cart') }}';
                     console.log('Tạo đơn hàng thành công', response);
                 },
                 error: function(error) {
@@ -154,7 +216,7 @@
     }
 
     const getProductsInCart = async () => {
-        const url = `http://127.0.0.1:8000/api/cart`;
+        const url = `/api/cart`;
         try {
             const response = await $.ajax({
                 url: url,
@@ -180,7 +242,6 @@
             ...orderData,
             payment_method_id: id,
         }
-        console.log(orderData);
     }
 
     const renderPaymentMethods = (methods) => {
@@ -198,7 +259,7 @@
     }
 
     const getPaymentMethods = async () => {
-        const url = `http://127.0.0.1:8000/api/payment/method`;
+        const url = `/api/payment/method`;
         try {
             const response = await $.ajax({
                 url: url,
@@ -219,5 +280,94 @@
         }
     }
     getPaymentMethods();
+
+    const renderAddresses = (addresses, data, defaultCode) => {
+        const selectAddresses = $(`#${addresses}`);
+
+        selectAddresses.html(`<option hidden selected>Select the ${addresses}</option>`);
+
+        // console.log(addresses, defaultCode);
+
+        data && data.forEach((item) => {
+            const htmlContent = parseInt(defaultCode) === item.code
+                ? `<option value="${item.code}" selected>${item.name}</option>`
+                : `<option value="${item.code}">${item.name}</option>`;
+
+            selectAddresses.html(selectAddresses.html() + htmlContent);
+        });
+    }
+
+    const getAddresses = async (addresses, code, defaultCode) => {
+        const url = addresses === 'provinces'
+            ? `https://provinces.open-api.vn/api/`
+            : addresses === 'districts'
+                ? `https://provinces.open-api.vn/api/p/${code}?depth=2`
+                : `https://provinces.open-api.vn/api/d/${code}?depth=2`;
+        try {
+            let response = await $.ajax({
+                url: url,
+                method: 'GET',
+            });
+
+            response = (Array.isArray(response) ? response : response[addresses]).sort((a, b) => {
+                return a.name.localeCompare(b.name);
+            });
+
+            renderAddresses(addresses, response, defaultCode);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    const selectAddressesChange = () => {
+        const provinces = $('#provinces');
+        const districts = $('#districts');
+        const wards = $('#wards');
+        const address = $('#number-address');
+
+        // Province
+        if (`{{ $user->province }}`.length === 0) {
+            getAddresses('provinces');
+        } else {
+            getAddresses('provinces', undefined, {{ $user->province }});
+            districts.prop('disabled', false);
+        }
+
+        // District
+        if (`{{ $user->district }}`.length !== 0) {
+            getAddresses('districts', provinces.val() || {{ $user->province }}, {{ $user->district }});
+            wards.prop('disabled', false);
+        }
+
+        // Ward
+        if (`{{ $user->ward }}`.length !== 0) {
+            getAddresses('wards', districts.val() || {{ $user->district }}, {{ $user->ward }});
+            address.prop('disabled', false);
+        }
+
+        // Number address
+        if (`{{ $user->number_address }}`.length !== 0) {
+            address.val(`{{ $user->number_address }}`);
+        }
+
+        // Change province
+        provinces.on('change', function () {
+            districts.prop('disabled', false);
+            wards.prop('disabled', true);
+            getAddresses('districts', provinces.val());
+        });
+
+        // Change district
+        districts.on('change', function () {
+            wards.prop('disabled', false);
+            getAddresses('wards', districts.val());
+        });
+
+        // Change ward
+        wards.on('change', function () {
+            address.prop('disabled', false);
+        });
+    }
+    selectAddressesChange();
 
 </script>
