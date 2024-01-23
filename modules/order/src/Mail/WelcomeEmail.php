@@ -42,7 +42,7 @@ class WelcomeEmail extends Mailable
     {
         Log::info('order', ['orderData' => $this->order]);
         return new Content(
-            view: 'test-send-mail',
+            view: 'Modules-Order::send-mail-order',
             with: [
                 'orderData' => $this->order,
             ]

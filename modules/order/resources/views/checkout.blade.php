@@ -164,6 +164,7 @@
                 data: JSON.stringify(orderData),
 
                 success: function(response) {
+                    window.location.href = '{{ route('order') }}';
                     console.log('Tạo đơn hàng thành công', response);
                 },
                 error: function(error) {

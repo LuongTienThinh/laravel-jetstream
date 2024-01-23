@@ -3,6 +3,7 @@
 namespace Modules\Order\Services;
 
 use App\Traits\ApiResponseTrait;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
@@ -36,5 +37,20 @@ class OrderService implements OrderInterface
         $order[0]['order_item'] = $orderItem;
 
         return $order;
+    }
+
+    public function getListOrders(string $userId): Collection|array
+    {
+        $orders = Order::query()->where('user_id', '=', $userId)
+                                ->orderBy('created_at', 'desc')
+                                ->get();
+
+        return $orders->map(function ($item) {
+            $item->order_time = $item->created_at->diffForHumans(Carbon::now());
+            $item->total_price = $item->orderItem->sum(function ($orderItem) {
+                return $orderItem->total_price;
+            });
+            return $item;
+        });
     }
 }

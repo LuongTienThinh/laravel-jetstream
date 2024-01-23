@@ -33,4 +33,3 @@ Route::middleware([
 });
 
 Route::get('/list-product', [ProductController::class, 'viewListProduct'])->name('list_product');
-Route::get('/send-mail', [ProductController::class, 'sendWelcomeMail'])->name('send_mail');

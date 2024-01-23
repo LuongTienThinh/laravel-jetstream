@@ -12,7 +12,8 @@ Route::middleware('api')->prefix('api')->group(function () {
     });
 
     Route::prefix('order')->group(function () {
-        Route::get('/get-{id}', [OrderController::class, 'getOrderById']);
+        Route::get('/list-order', [OrderController::class, 'getListOrders']);
+        Route::get('/order-detail/{id}', [OrderController::class, 'getOrderDetails']);
     });
 });
 
