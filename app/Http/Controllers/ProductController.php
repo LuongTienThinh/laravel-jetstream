@@ -5,24 +5,23 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdateProductRequest;
 use App\Repositories\ProductRepository;
 use App\Traits\ApiResponseTrait;
-use App\Jobs\ProcessSendMail;
+use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Modules\Order\Jobs\ProcessSendMail;
 use OpenApi\Attributes\Delete;
 use OpenApi\Attributes\Get;
+use OpenApi\Attributes\JsonContent;
 use OpenApi\Attributes\Parameter;
 use OpenApi\Attributes\Post;
+use OpenApi\Attributes\Property;
 use OpenApi\Attributes\Put;
 use OpenApi\Attributes\RequestBody;
-use OpenApi\Attributes\JsonContent;
-use OpenApi\Attributes\Property;
 use OpenApi\Attributes\Response;
 use OpenApi\Attributes\Schema;
-use Exception;
 
 /**
  * @OA\Info(title="My First API", version="0.1")
@@ -319,12 +318,5 @@ class ProductController extends Controller
     public function viewListProduct(): View|Application|Factory|string|null
     {
         return view('list-product');
-    }
-
-    public function sendWelcomeMail(): string
-    {
-        $mailJob = new ProcessSendMail();
-        dispatch($mailJob);
-        return "Test send mail";
     }
 }

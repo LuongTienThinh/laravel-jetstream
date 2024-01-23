@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Modules\Cart\Services\CartItemService;
+use Modules\Order\Jobs\ProcessSendMail;
 use Modules\Order\Services\OrderService;
 use Modules\Order\Services\OrderItemService;
 
@@ -62,6 +63,8 @@ class OrderItemController extends Controller
                     ], $item['product_id']);
                 }
 
+                ProcessSendMail::dispatch(Auth::user()->email, $order);
+
                 return $this->successResponse(null, 200, 'Create success');
             }
             return $this->errorResponse(200, 'Create fail');
@@ -70,8 +73,3 @@ class OrderItemController extends Controller
         }
     }
 }
-//  Khi thanh toán, thực hiện các công việc:
-//  - tạo order (v)
-//  - thêm sản phẩm vào order (v)
-//  - xoá sản phẩm khỏi cart (v)
-//  - giảm số lượng sản phẩm (v)
