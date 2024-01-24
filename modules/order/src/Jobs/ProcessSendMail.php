@@ -2,6 +2,7 @@
 
 namespace Modules\Order\Jobs;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -15,16 +16,18 @@ class ProcessSendMail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public string $userMail;
-    public Order $order;
+    protected string $userMail;
+    protected Order $order;
+    protected User $user;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(string $userMail, Order $order)
+    public function __construct(string $userMail, Order $order, User $user)
     {
         $this->userMail = $userMail;
         $this->order = $order;
+        $this->user = $user;
     }
 
     /**
@@ -32,6 +35,6 @@ class ProcessSendMail implements ShouldQueue
      */
     public function handle(): void
     {
-        Mail::to($this->userMail)->queue(new WelcomeEmail($this->order));
+        Mail::to($this->userMail)->queue(new WelcomeEmail($this->order, $this->user));
     }
 }

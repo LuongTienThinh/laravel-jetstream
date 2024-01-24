@@ -128,9 +128,9 @@
                     const ward = $('#wards');
                     const numberAddress = $('#number-address');
                     const data = {
-                        'province': province.val(),
-                        'district': district.val(),
-                        'ward': ward.val(),
+                        'province': province.children(':selected').text() + "#" + province.val(),
+                        'district': district.children(':selected').text() + "#" + district.val(),
+                        'ward': ward.children(':selected').text() + "#" + ward.val(),
                         'number_address': numberAddress.val(),
                     }
                     const url = `/api/user/address/update`;
@@ -282,13 +282,13 @@
     }
     getPaymentMethods();
 
-    const renderAddresses = (addresses, data, defaultCode) => {
+    const renderAddresses = (addresses, data, defaultValue) => {
         const selectAddresses = $(`#${addresses}`);
 
         selectAddresses.html(`<option hidden selected>Select the ${addresses}</option>`);
 
         data && data.forEach((item) => {
-            const htmlContent = parseInt(defaultCode) === item.code
+            const htmlContent = defaultValue === item.name
                 ? `<option value="${item.code}" selected>${item.name}</option>`
                 : `<option value="${item.code}">${item.name}</option>`;
 
@@ -296,7 +296,7 @@
         });
     }
 
-    const getAddresses = async (addresses, code, defaultCode) => {
+    const getAddresses = async (addresses, code, defaultValue) => {
         const url = addresses === 'provinces'
             ? `https://provinces.open-api.vn/api/`
             : addresses === 'districts'
@@ -312,7 +312,7 @@
                 return a.name.localeCompare(b.name);
             });
 
-            renderAddresses(addresses, response, defaultCode);
+            renderAddresses(addresses, response, defaultValue);
         } catch (error) {
             console.error('Error:', error);
         }
@@ -328,19 +328,28 @@
         if (`{{ $user->province }}`.length === 0) {
             getAddresses('provinces');
         } else {
-            getAddresses('provinces', undefined, {{ $user->province }});
+            const userProvince = '{{ $user->province }}'.split('#');
+            const provinceName = userProvince[0];
+
+            getAddresses('provinces', undefined, provinceName);
             districts.prop('disabled', false);
         }
 
         // District
         if (`{{ $user->district }}`.length !== 0) {
-            getAddresses('districts', provinces.val() || {{ $user->province }}, {{ $user->district }});
+            const userDistrict = '{{ $user->district }}'.split('#');
+            const districtName = userDistrict[0];
+
+            getAddresses('districts', provinces.val() || '{{ $user->province }}'.split('#')[1], districtName);
             wards.prop('disabled', false);
         }
 
         // Ward
         if (`{{ $user->ward }}`.length !== 0) {
-            getAddresses('wards', districts.val() || {{ $user->district }}, {{ $user->ward }});
+            const userWard = '{{ $user->ward }}'.split('#');
+            const wardName = userWard[0];
+
+            getAddresses('wards', districts.val() || '{{ $user->district }}'.split('#')[1], wardName);
             address.prop('disabled', false);
         }
 

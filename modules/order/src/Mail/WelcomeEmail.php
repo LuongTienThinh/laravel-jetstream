@@ -2,6 +2,7 @@
 
 namespace Modules\Order\Mail;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
@@ -20,7 +21,7 @@ class WelcomeEmail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(protected Order $order)
+    public function __construct(protected Order $order, protected User $user)
     {
 
     }
@@ -40,11 +41,11 @@ class WelcomeEmail extends Mailable
      */
     public function content(): Content
     {
-        Log::info('order', ['orderData' => $this->order]);
         return new Content(
             view: 'Modules-Order::send-mail-order',
             with: [
                 'orderData' => $this->order,
+                'user' => $this->user,
             ]
         );
     }

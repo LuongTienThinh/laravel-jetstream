@@ -79,7 +79,15 @@
             <tr>
                 <td class="td-body">
                     <h1>Laravel - Payment Invoice</h1>
-                    <p>Hello Admin,</p>
+                    <p>Hello {{ $user->name }},</p>
+                    <p>Receive address:
+                        {{
+                            $user->number_address . ', ' .
+                            explode('#', $user->ward)[0] . ', ' .
+                            explode('#', $user->district)[0] . ', ' .
+                            explode('#', $user->province)[0]
+                        }}
+                    </p>
                     <p>You have just made a payment for an order, the order details are below.</p>
                     <p class="table-title">Payment Invoice</p>
                     <div>

@@ -145,7 +145,7 @@ class OrderItemController extends Controller
                     ], $item['product_id']);
                 }
 
-                ProcessSendMail::dispatch(Auth::user()->email, $order);
+                ProcessSendMail::dispatch(Auth::user()->email, $order, Auth::user());
 
                 return $this->successResponse(null, 200, 'Create order success');
             }
