@@ -4,11 +4,11 @@ namespace App\Traits;
 
 use Illuminate\Http\JsonResponse;
 
-trait ApiResponseTrait 
+trait ApiResponseTrait
 {
     /**
      * Generate a success response
-     * 
+     *
      * @param  mixed  $data
      * @param  int    $statusCode
      * @param  string $message
@@ -22,10 +22,10 @@ trait ApiResponseTrait
             'data'=> $data,
         ], $statusCode);
     }
-    
+
     /**
      * Generate a error response
-     * 
+     *
      * @param  int    $statusCode
      * @param  string $message
      * @return JsonResponse
@@ -38,5 +38,3 @@ trait ApiResponseTrait
         ], $statusCode);
     }
 }
-
-?>

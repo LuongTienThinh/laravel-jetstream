@@ -22,6 +22,11 @@ class Product extends Model
         'category_id',
     ];
 
+    /**
+     * Relationship between Product and Category
+     *
+     * @return BelongsTo
+     */
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
