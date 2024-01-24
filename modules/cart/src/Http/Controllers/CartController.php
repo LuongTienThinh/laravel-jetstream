@@ -22,9 +22,26 @@ class CartController extends Controller
 {
     use ApiResponseTrait;
 
+    /**
+     * The cart service variable
+     *
+     * @var CartService
+     */
     public CartService $cartService;
+
+    /**
+     * The cart item service variable
+     *
+     * @var CartItemService
+     */
     public CartItemService $cartItemService;
 
+    /**
+     * Constructor function for CartController
+     *
+     * @param CartService $cartService
+     * @param CartItemService $cartItemService
+     */
     public function __construct(CartService $cartService, CartItemService $cartItemService)
     {
         $this->cartService = $cartService;
@@ -80,7 +97,7 @@ class CartController extends Controller
     }
 
     /**
-     * Display view cart detail
+     * Show view cart
      *
      * @return View|Application|Factory|string|null
      */

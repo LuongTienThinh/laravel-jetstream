@@ -3,42 +3,36 @@
 namespace Modules\Order\Services;
 
 use App\Traits\ApiResponseTrait;
-use App\Validators\ProductValidator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Modules\Order\Models\OrderItem;
-use Modules\Order\Services\Interfaces\OrderInterface;
 use Modules\Order\Services\Interfaces\OrderItemInterface;
-use Prettus\Repository\Criteria\RequestCriteria;
-use Prettus\Repository\Eloquent\BaseRepository;
 
 /**
- * Class ProductRepositoryEloquent.
+ * Class OrderItemService.
  *
- * @package namespace App\Repositories;
+ * @package namespace Modules\Order\Services;
  */
-class OrderItemService extends BaseRepository implements OrderItemInterface
+class OrderItemService implements OrderItemInterface
 {
     use ApiResponseTrait;
 
-    /**
-     * Specify Model class name
-     *
-     * @return string
-     */
-    public function model()
+    public function create(array $attributes): Builder|Model
     {
-        return OrderItem::class;
+        return OrderItem::query()->create($attributes);
     }
 
-    /**
-     * Boot up the repository, pushing criteria
-     */
-    public function boot()
+    public function getOrderItemByOrder(string $orderId): Collection|array
     {
-        $this->pushCriteria(app(RequestCriteria::class));
-    }
+        $orderItem = OrderItem::query()->where('order_id', '=', $orderId)
+                                       ->with('product')
+                                       ->get();
 
-    public function create(array $attributes): mixed
-    {
-        return $this->model->create($attributes);
+        return $orderItem->map(function ($item) {
+            $item->product_name = $item->product->name;
+            unset($item->product);
+            return $item;
+        });
     }
 }

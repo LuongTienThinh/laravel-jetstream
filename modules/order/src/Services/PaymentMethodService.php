@@ -11,34 +11,16 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use Prettus\Repository\Eloquent\BaseRepository;
 
 /**
- * Class ProductRepositoryEloquent.
+ * Class PaymentMethodService.
  *
- * @package namespace App\Repositories;
+ * @package namespace Modules\Order\Services;
  */
-class PaymentMethodService extends BaseRepository implements PaymentMethodInterface
+class PaymentMethodService implements PaymentMethodInterface
 {
     use ApiResponseTrait;
 
-    /**
-     * Specify Model class name
-     *
-     * @return string
-     */
-    public function model()
-    {
-        return PaymentMethod::class;
-    }
-
-    /**
-     * Boot up the repository, pushing criteria
-     */
-    public function boot()
-    {
-        $this->pushCriteria(app(RequestCriteria::class));
-    }
-
     public function getPaymentMethods(): Collection
     {
-        return $this->model->all();
+        return PaymentMethod::query()->get();
     }
 }

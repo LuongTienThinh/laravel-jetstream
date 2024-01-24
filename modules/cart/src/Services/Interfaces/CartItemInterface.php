@@ -9,9 +9,9 @@ use Illuminate\Support\Collection;
 use Modules\Cart\Http\Requests\UpdateCartRequest;
 
 /**
- * Interface ProductRepository.
+ * Interface CartItemInterface.
  *
- * @package namespace App\Repositories;
+ * @package namespace Modules\Cart\Services\Interfaces;
  */
 interface CartItemInterface
 {

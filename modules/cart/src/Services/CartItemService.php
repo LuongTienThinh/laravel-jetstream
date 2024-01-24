@@ -4,7 +4,6 @@ namespace Modules\Cart\Services;
 
 use App\Traits\ApiResponseTrait;
 use App\Models\Product;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,9 +15,9 @@ use Modules\Cart\Models\CartItem;
 use Modules\Cart\Services\Interfaces\CartItemInterface;
 
 /**
- * Class ProductRepositoryEloquent.
+ * Class CartItemService.
  *
- * @package namespace App\Repositories;
+ * @package namespace Modules\Cart\Services;
  */
 class CartItemService implements CartItemInterface
 {
@@ -110,9 +109,9 @@ class CartItemService implements CartItemInterface
 
             $products = $this->handleCartDataNoLogin($products);
 
-            return $this->successResponse($products, 200, "Get list cart items success");
+            return $this->successResponse($products, 200, "Get list cart items success.");
         }
-        return $this->successResponse([], 200, "Get list cart items success");
+        return $this->successResponse([], 200, "Get list cart items success.");
     }
 
     public function getCartItemsLogged(Request $request): JsonResponse
@@ -141,7 +140,7 @@ class CartItemService implements CartItemInterface
         $products = $this->getCartItemByCartId($cartId)->get();
         $data = $this->handleDataBeforeResponse($products);
 
-        return $this->successResponse($data, 200, "Get list cart items success")
+        return $this->successResponse($data, 200, "Get list cart items success.")
                     ->cookie(Cookie::forget('cart-list'));
     }
 
@@ -166,7 +165,7 @@ class CartItemService implements CartItemInterface
             $cartList[] = $cartItem;
         }
 
-        $message = "Add cart item to cart success";
+        $message = "Add cart item to cart success.";
         return $this->successResponse(null, 200, $message)
                     ->cookie('cart-list', json_encode($cartList), 60);
     }
@@ -179,10 +178,13 @@ class CartItemService implements CartItemInterface
         if($this->isCartItemInCart($cartId, $productId)) {
             $this->updateCartItemExistedInCart($request->validated(), $cartId, $productId);
         } else {
-            $this->create($request->validated());
+            $this->create([
+                'cart_id' => $cartId,
+                ...$request->validated()
+            ]);
         }
 
-        $message = "Add cart item to cart success";
+        $message = "Add cart item to cart success.";
         return $this->successResponse(null, 200, $message);
     }
 
@@ -200,7 +202,7 @@ class CartItemService implements CartItemInterface
             return $item;
         }, $cartList);
 
-        $message = "Update a cart item success";
+        $message = "Update a cart item success.";
         return $this->successResponse(null, 200, $message)
                     ->cookie('cart-list', json_encode($cartList), 60);
     }
@@ -210,7 +212,7 @@ class CartItemService implements CartItemInterface
         $cartId = Auth::user()->cart->id;
         $this->updateCartItem($request->validated(), $cartId, $cartItemId);
 
-        $message = "Update a cart item success";
+        $message = "Update a cart item success.";
         return $this->successResponse(null, 200, $message);
     }
 
@@ -222,7 +224,7 @@ class CartItemService implements CartItemInterface
             return $item->product_id != $productId;
         });
 
-        $message = "Remove a cart item success";
+        $message = "Remove a cart item success.";
         return $this->successResponse(null, 200, $message)
                     ->cookie('cart-list', json_encode($cartList), 60);
     }
@@ -232,7 +234,7 @@ class CartItemService implements CartItemInterface
         $cartId = Auth::user()->cart->id;
         $this->deleteCartItem($cartId, $productId);
 
-        $message = "Remove a cart item success";
+        $message = "Remove a cart item success.";
         return $this->successResponse(null, 200, $message);
     }
 }

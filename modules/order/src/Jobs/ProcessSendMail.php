@@ -1,26 +1,33 @@
 <?php
 
-namespace App\Jobs;
+namespace Modules\Order\Jobs;
 
-use App\Mail\WelcomeEmail;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
+use Modules\Order\Mail\WelcomeEmail;
+use Modules\Order\Models\Order;
 
 class ProcessSendMail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected string $userMail;
+    protected Order $order;
+    protected User $user;
+
     /**
      * Create a new job instance.
      */
-    public function __construct()
+    public function __construct(string $userMail, Order $order, User $user)
     {
-        //
+        $this->userMail = $userMail;
+        $this->order = $order;
+        $this->user = $user;
     }
 
     /**
@@ -28,7 +35,6 @@ class ProcessSendMail implements ShouldQueue
      */
     public function handle(): void
     {
-        $userMail = '21211tt4963@mail.tdc.edu.vn';
-        Mail::to($userMail)->send(new WelcomeEmail());
+        Mail::to($this->userMail)->queue(new WelcomeEmail($this->order, $this->user));
     }
 }

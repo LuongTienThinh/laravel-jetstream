@@ -5,21 +5,22 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UpdateProductRequest;
 use App\Repositories\ProductRepository;
 use App\Traits\ApiResponseTrait;
-use App\Jobs\ProcessSendMail;
+use Exception;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use OpenApi\Attributes\Delete;
 use OpenApi\Attributes\Get;
+use OpenApi\Attributes\JsonContent;
 use OpenApi\Attributes\Parameter;
 use OpenApi\Attributes\Post;
+use OpenApi\Attributes\Property;
 use OpenApi\Attributes\Put;
 use OpenApi\Attributes\RequestBody;
-use OpenApi\Attributes\JsonContent;
-use OpenApi\Attributes\Property;
 use OpenApi\Attributes\Response;
 use OpenApi\Attributes\Schema;
-use Exception;
 
 /**
  * @OA\Info(title="My First API", version="0.1")
@@ -28,8 +29,18 @@ class ProductController extends Controller
 {
     use ApiResponseTrait;
 
+    /**
+     * The product service variable
+     *
+     * @var ProductRepository
+     */
     public ProductRepository $productRepository;
 
+    /**
+     * Constructor function for ProductController
+     *
+     * @param ProductRepository $productRepository
+     */
     public function __construct(ProductRepository $productRepository)
     {
         $this->productRepository = $productRepository;
@@ -72,7 +83,7 @@ class ProductController extends Controller
                 content: new JsonContent(
                     properties: [
                         new Property(property: "status", type: "int", example: 200),
-                        new Property(property: "message", type: "string", example: "Get list products successfully.")
+                        new Property(property: "message", type: "string", example: "Get list products success.")
                     ]
                 )
             ),
@@ -137,7 +148,7 @@ class ProductController extends Controller
                 description: 'Success',
                 content: new JsonContent(
                     properties: [
-                        new Property(property: "message", type: "string", example: "Create a product successfully.")
+                        new Property(property: "message", type: "string", example: "Create a product success.")
                     ]
                 )
             ),
@@ -157,7 +168,7 @@ class ProductController extends Controller
         try {
             $this->productRepository->create($request->validated());
 
-            $message = 'Product created successfully';
+            $message = 'Product created success.';
             return $this->successResponse(null, 200, $message);
         } catch (Exception $e) {
             return $this->errorResponse(500, $e->getMessage());
@@ -183,8 +194,8 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  Request $request
-     * @param  string  $id
+     * @param  UpdateProductRequest $request
+     * @param  string $id
      * @return JsonResponse
      */
     #[Put(
@@ -220,7 +231,7 @@ class ProductController extends Controller
                 description: 'Success',
                 content: new JsonContent(
                     properties: [
-                        new Property(property: "message", type: "string", example: "Update a product successfully.")
+                        new Property(property: "message", type: "string", example: "Update a product success.")
                     ]
                 )
             ),
@@ -240,7 +251,7 @@ class ProductController extends Controller
         try {
             $result = $this->productRepository->update($request->validated(), $id);
             if ($result) {
-                $message = 'Product updated successfully';
+                $message = 'Product updated success.';
                 return $this->successResponse(null, 200, $message);
             } else {
                 return response()->json(['message' => 'Product not found.'], 404);
@@ -278,7 +289,7 @@ class ProductController extends Controller
                 description: 'Success',
                 content: new JsonContent(
                     properties: [
-                        new Property(property: "message", type: "string", example: "Delete a product successfully.")
+                        new Property(property: "message", type: "string", example: "Delete a product success.")
                     ]
                 )
             ),
@@ -298,7 +309,7 @@ class ProductController extends Controller
         try {
             $result = $this->productRepository->delete($id);
             if ($result) {
-                $message = 'Product deleted successfully';
+                $message = 'Product deleted success.';
                 return $this->successResponse(null, 200, $message);
             } else {
                 return response()->json(['message' => 'Product not found.'], 404);
@@ -308,10 +319,49 @@ class ProductController extends Controller
         }
     }
 
-    public function sendWelcomeMail(): string
+    /**
+     * Show view product
+     *
+     * @return View|Application|Factory|string|null
+     */
+    public function viewProduct(): View|Application|Factory|string|null
     {
-        $mailJob = new ProcessSendMail();
-        dispatch($mailJob);
-        return "Test send mail";
+        $page = 1;
+        $search = '';
+
+        if (isset($_GET['page'])) {
+            $page = $_GET['page'];
+        }
+
+        if (isset($_GET['search'])) {
+            $search = $_GET['search'];
+        }
+
+        $url = request()->path();
+
+        return view('product', ['page' => $page, 'search' => $search, 'url' => $url]);
+    }
+
+    /**
+     * Show view list product
+     *
+     * @return View|Application|Factory|string|null
+     */
+    public function viewListProduct(): View|Application|Factory|string|null
+    {
+        $page = 1;
+        $search = '';
+
+        if (isset($_GET['page'])) {
+            $page = $_GET['page'];
+        }
+
+        if (isset($_GET['search'])) {
+            $search = $_GET['search'];
+        }
+
+        $url = request()->path();
+
+        return view('list-product', ['page' => $page, 'search' => $search, 'url' => $url]);
     }
 }

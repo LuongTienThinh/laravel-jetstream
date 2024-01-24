@@ -3,41 +3,54 @@
 namespace Modules\Order\Services;
 
 use App\Traits\ApiResponseTrait;
-use App\Validators\ProductValidator;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 use Modules\Order\Models\Order;
 use Modules\Order\Services\Interfaces\OrderInterface;
-use Prettus\Repository\Criteria\RequestCriteria;
-use Prettus\Repository\Eloquent\BaseRepository;
 
 /**
- * Class ProductRepositoryEloquent.
+ * Class OrderService.
  *
- * @package namespace App\Repositories;
+ * @package namespace Modules\Order\Services;
  */
-class OrderService extends BaseRepository implements OrderInterface
+class OrderService implements OrderInterface
 {
     use ApiResponseTrait;
 
-    /**
-     * Specify Model class name
-     *
-     * @return string
-     */
-    public function model()
+    public function create(array $attributes): Builder|Model
     {
-        return Order::class;
+        return Order::query()->create($attributes);
     }
 
-    /**
-     * Boot up the repository, pushing criteria
-     */
-    public function boot()
+    public function findOrder(string $id): Builder|array|Collection|Model
     {
-        $this->pushCriteria(app(RequestCriteria::class));
+        return Order::query()->where('id', '=', $id);
     }
 
-    public function create(array $attributes): mixed
+    public function getOrderById(string $id): Collection
     {
-        return $this->model->create($attributes);
+        $order = $this->findOrder($id)->get();
+        $orderItem = (new OrderItemService())->getOrderItemByOrder($id);
+
+        $order[0]['order_item'] = $orderItem;
+
+        return $order;
+    }
+
+    public function getListOrders(string $userId): Collection|array
+    {
+        $orders = Order::query()->where('user_id', '=', $userId)
+                                ->orderBy('created_at', 'desc')
+                                ->get();
+
+        return $orders->map(function ($item) {
+            $item->order_time = $item->created_at->diffForHumans(Carbon::now());
+            $item->total_price = $item->orderItem->sum(function ($orderItem) {
+                return $orderItem->total_price;
+            });
+            return $item;
+        });
     }
 }

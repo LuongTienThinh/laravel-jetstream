@@ -62,7 +62,7 @@
                     $(`#cart-quantity-${cartId}-${cartItemId}`).val(),
                 ];
 
-                const url = `http://127.0.0.1:8000/api/cart/edit/${cartItemId}`;
+                const url = `/api/cart/edit/${cartItemId}`;
                 $.ajax({
                     url: url,
                     type: 'PUT',
@@ -90,7 +90,7 @@
             $(this).on('click', () => {
                 const cartItemId = this.id.split('-')[2];
 
-                const url = `http://127.0.0.1:8000/api/cart/delete/${cartItemId}`;
+                const url = `/api/cart/delete/${cartItemId}`;
                 $.ajax({
                     url: url,
                     type: 'DELETE',
@@ -170,7 +170,7 @@
     }
 
     const getProductsInCart = async () => {
-        const url = `http://127.0.0.1:8000/api/cart`;
+        const url = `/api/cart`;
         try {
             const response = await $.ajax({
                 url: url,
@@ -180,7 +180,6 @@
             $('#pagination').html("");
 
             renderProducts(response.data.products);
-            paginationProduct(response.data);
 
         } catch (error) {
             console.error('Error:', error);

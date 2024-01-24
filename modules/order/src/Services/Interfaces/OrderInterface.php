@@ -4,21 +4,36 @@ namespace Modules\Order\Services\Interfaces;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\JsonResponse;
-use Prettus\Repository\Contracts\RepositoryInterface;
+use Illuminate\Database\Eloquent\Model;
 
 /**
- * Interface ProductRepository.
+ * Interface OrderInterface.
  *
- * @package namespace App\Repositories;
+ * @package namespace Modules\Order\Services\Interfaces;
  */
-interface OrderInterface extends RepositoryInterface
+interface OrderInterface
 {
     /**
      * Create a new order
      *
      * @param  array $attributes
-     * @return mixed
+     * @return Builder|Model
      */
-    public function create(array $attributes): mixed;
+    public function create(array $attributes): Builder|Model;
+
+    /**
+     * Find order by id
+     *
+     * @param  string $id
+     * @return Builder|array|Collection|Model
+     */
+    public function findOrder(string $id): array|Builder|Collection|Model;
+
+    /**
+     * Get order by id
+     *
+     * @param  string $id
+     * @return \Illuminate\Support\Collection
+     */
+    public function getOrderById(string $id): \Illuminate\Support\Collection;
 }
