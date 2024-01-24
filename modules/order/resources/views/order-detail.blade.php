@@ -47,8 +47,6 @@
                             </li>`);
         }
 
-        console.log(orders);
-
         orders && orders.length > 0 && orders.forEach((item, index) => {
             cartTotalPrice += item.total_price;
             const htmlContent =
@@ -66,17 +64,13 @@
     const getOrderDetail = async () => {
         const url = '/api/order/order-detail/{{ $orderId }}';
 
-        console.log(url);
-
         try {
             const response = await $.ajax({
                 url: url,
                 method: 'GET',
             });
 
-            console.log(response.data);
             renderOrderDetail(response.data[0].order_item);
-
         } catch (error) {
             console.error('Error:', error);
         }

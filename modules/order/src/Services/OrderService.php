@@ -11,9 +11,9 @@ use Modules\Order\Models\Order;
 use Modules\Order\Services\Interfaces\OrderInterface;
 
 /**
- * Class ProductRepositoryEloquent.
+ * Class OrderService.
  *
- * @package namespace App\Repositories;
+ * @package namespace Modules\Order\Services;
  */
 class OrderService implements OrderInterface
 {

@@ -10,9 +10,9 @@ use Modules\Order\Models\OrderItem;
 use Modules\Order\Services\Interfaces\OrderItemInterface;
 
 /**
- * Class ProductRepositoryEloquent.
+ * Class OrderItemService.
  *
- * @package namespace App\Repositories;
+ * @package namespace Modules\Order\Services;
  */
 class OrderItemService implements OrderItemInterface
 {

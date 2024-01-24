@@ -5,12 +5,11 @@ namespace Modules\Order\Services\Interfaces;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\JsonResponse;
 
 /**
- * Interface ProductRepository.
+ * Interface OrderInterface.
  *
- * @package namespace App\Repositories;
+ * @package namespace Modules\Order\Services\Interfaces;
  */
 interface OrderInterface
 {
@@ -30,5 +29,11 @@ interface OrderInterface
      */
     public function findOrder(string $id): array|Builder|Collection|Model;
 
+    /**
+     * Get order by id
+     *
+     * @param  string $id
+     * @return \Illuminate\Support\Collection
+     */
     public function getOrderById(string $id): \Illuminate\Support\Collection;
 }

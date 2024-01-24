@@ -5,6 +5,242 @@
         "version": "0.1"
     },
     "paths": {
+        "/api/category": {
+            "get": {
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Get list categories",
+                "description": "Get list categories.",
+                "operationId": "getListCategories",
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Get list categories success."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 500
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/category/create": {
+            "post": {
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Create a category",
+                "description": "Create a category and add it into categories table.",
+                "operationId": "createCategory",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Screen"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Create a category successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/category/edit/{id}": {
+            "put": {
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Update a category",
+                "description": "Update a category's information in categories table",
+                "operationId": "updateCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Screen"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Update a category success."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/category/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Delete a category",
+                "description": "Delete a category's information in categories table",
+                "operationId": "deleteCategory",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Delete a category success."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/product/get-list": {
             "get": {
                 "tags": [
@@ -44,7 +280,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Get list products successfully."
+                                            "example": "Get list products success."
                                         }
                                     },
                                     "type": "object"
@@ -121,7 +357,7 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Create a product successfully."
+                                            "example": "Create a product success."
                                         }
                                     },
                                     "type": "object"
@@ -204,7 +440,7 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Update a product successfully."
+                                            "example": "Update a product success."
                                         }
                                     },
                                     "type": "object"
@@ -258,7 +494,7 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Delete a product successfully."
+                                            "example": "Delete a product success."
                                         }
                                     },
                                     "type": "object"
@@ -285,40 +521,74 @@
                 }
             }
         },
-        "/api/cart/{id}": {
+        "/api/user/address/update": {
+            "put": {
+                "tags": [
+                    "users"
+                ],
+                "summary": "Update a user",
+                "description": "Update a user's information in users table",
+                "operationId": "updateUser",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Smith"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Update a user success."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Internal server error."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/cart": {
             "get": {
                 "tags": [
                     "carts"
                 ],
-                "summary": "Get list cart products",
-                "description": "Get list products by search (default: empty) for each page (default: 1) in cart of user.",
-                "operationId": "getListCartProduct",
-                "parameters": [
-                    {
-                        "name": "search",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "required": false,
-                        "schema": {
-                            "type": "int"
-                        }
-                    },
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
+                "summary": "Get list cart items",
+                "description": "Get list items in cart of user.",
+                "operationId": "getListCartItem",
                 "responses": {
                     "200": {
                         "description": "Success",
@@ -332,7 +602,7 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Get list products successfully."
+                                            "example": "Get list items success."
                                         }
                                     },
                                     "type": "object"
@@ -368,19 +638,15 @@
                 "tags": [
                     "carts"
                 ],
-                "summary": "Add product to cart",
-                "description": "Add a product to cart of user.",
-                "operationId": "addProductToCart",
+                "summary": "Add a cart item.",
+                "description": "Add a cart item to cart.",
+                "operationId": "addCartItem",
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "cart_id": {
-                                        "type": "string",
-                                        "example": "10"
-                                    },
                                     "product_id": {
                                         "type": "string",
                                         "example": "1"
@@ -409,7 +675,7 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Add product to cart success."
+                                            "example": "Add cart item to cart success."
                                         }
                                     },
                                     "type": "object"
@@ -436,25 +702,17 @@
                 }
             }
         },
-        "/api/cart/edit/{cart_id}-{product_id}": {
+        "/api/cart/edit/{cart_item_id}": {
             "put": {
                 "tags": [
                     "carts"
                 ],
-                "summary": "Update a product",
-                "description": "Update a product from cart of user.",
-                "operationId": "updateCartProduct",
+                "summary": "Update a cart item.",
+                "description": "Update a cart item in cart.",
+                "operationId": "updateCartItem",
                 "parameters": [
                     {
-                        "name": "cart_id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    {
-                        "name": "product_id",
+                        "name": "cart_item_id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -468,10 +726,6 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "cart_id": {
-                                        "type": "string",
-                                        "example": "10"
-                                    },
                                     "product_id": {
                                         "type": "string",
                                         "example": "1"
@@ -500,7 +754,7 @@
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Update a product success."
+                                            "example": "Update a cart item success."
                                         }
                                     },
                                     "type": "object"
@@ -527,23 +781,15 @@
                 }
             }
         },
-        "/api/cart/delete/{cart_id}-{product_id}": {
+        "/api/cart/delete/{cart_item_id}": {
             "delete": {
                 "tags": [
                     "carts"
                 ],
-                "summary": "Remove product from cart",
-                "description": "Remove a product from cart of user.",
-                "operationId": "removeCartProduct",
+                "summary": "Remove a cart item.",
+                "description": "Remove a cart item from cart.",
+                "operationId": "removeCartItem",
                 "parameters": [
-                    {
-                        "name": "cart_id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
                     {
                         "name": "product_id",
                         "in": "path",

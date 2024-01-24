@@ -58,7 +58,6 @@
                 method: 'GET',
             });
 
-            console.log(response.data);
             renderListOrder(response.data);
 
         } catch (error) {

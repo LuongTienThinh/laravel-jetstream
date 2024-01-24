@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * Interface OrderItemInterface.
  *
- * @package namespace App\Repositories;
+ * @package namespace Modules\Order\Services\Interfaces;
  */
 interface OrderItemInterface
 {

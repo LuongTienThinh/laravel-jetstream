@@ -287,8 +287,6 @@
 
         selectAddresses.html(`<option hidden selected>Select the ${addresses}</option>`);
 
-        // console.log(addresses, defaultCode);
-
         data && data.forEach((item) => {
             const htmlContent = parseInt(defaultCode) === item.code
                 ? `<option value="${item.code}" selected>${item.name}</option>`
