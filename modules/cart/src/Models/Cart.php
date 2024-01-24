@@ -24,6 +24,8 @@ class Cart extends Model
     ];
 
     /**
+     * Relationship between Cart and User
+     *
      * @return BelongsTo
      */
     public function user(): BelongsTo

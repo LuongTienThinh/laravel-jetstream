@@ -28,6 +28,8 @@ class CartItem extends Model
     ];
 
     /**
+     * Relationship between CartItem and Cart
+     *
      * @return BelongsTo
      */
     public function cart(): BelongsTo
@@ -35,6 +37,11 @@ class CartItem extends Model
         return $this->belongsTo(Cart::class);
     }
 
+    /**
+     * Relationship between CartItem and Product
+     *
+     * @return BelongsTo
+     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);

@@ -1,18 +1,3 @@
-<?php
-$page = 1;
-$search = '';
-
-if (isset($_GET['page'])) {
-    $page = $_GET['page'];
-}
-
-if (isset($_GET['search'])) {
-    $search = $_GET['search'];
-}
-
-$url = request()->path();
-
-?>
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">

@@ -7,9 +7,9 @@ use Modules\Cart\Services\Interfaces\CartInterface;
 use Modules\Cart\Models\Cart;
 
 /**
- * Class ProductRepositoryEloquent.
+ * Class CartService.
  *
- * @package namespace App\Repositories;
+ * @package namespace Modules\Cart\Services;
  */
 class CartService implements CartInterface
 {

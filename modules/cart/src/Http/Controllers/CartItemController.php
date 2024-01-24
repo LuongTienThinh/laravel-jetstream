@@ -24,8 +24,18 @@ class CartItemController extends Controller
 {
     use ApiResponseTrait;
 
+    /**
+     * The cart item service
+     *
+     * @var CartItemService
+     */
     public CartItemService $cartItemService;
 
+    /**
+     * Constructor function for CartItemController
+     *
+     * @param CartItemService $cartItemService
+     */
     public function __construct(CartItemService $cartItemService)
     {
         $this->cartItemService = $cartItemService;

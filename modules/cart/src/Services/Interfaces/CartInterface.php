@@ -3,9 +3,9 @@
 namespace Modules\Cart\Services\Interfaces;
 
 /**
- * Interface ProductRepository.
+ * Interface CartInterface.
  *
- * @package namespace App\Repositories;
+ * @package namespace Modules\Cart\Services\Interfaces;
  */
 interface CartInterface
 {

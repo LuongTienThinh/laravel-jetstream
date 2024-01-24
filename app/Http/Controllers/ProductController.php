@@ -349,6 +349,19 @@ class ProductController extends Controller
      */
     public function viewListProduct(): View|Application|Factory|string|null
     {
-        return view('list-product');
+        $page = 1;
+        $search = '';
+
+        if (isset($_GET['page'])) {
+            $page = $_GET['page'];
+        }
+
+        if (isset($_GET['search'])) {
+            $search = $_GET['search'];
+        }
+
+        $url = request()->path();
+
+        return view('list-product', ['page' => $page, 'search' => $search, 'url' => $url]);
     }
 }
